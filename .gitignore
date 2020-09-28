@@ -1,0 +1,7 @@
+node_modules/
+/obtainEvidenceDist/
+package-lock.json
+.project
+.idea/
+/obtainweb
+demo_kafka_vue/
