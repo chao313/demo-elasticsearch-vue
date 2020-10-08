@@ -16,68 +16,71 @@
         </div>
         <div class="app-list">
             <div class="app-tab">
-                <h5 class="form-tit">cluster的信息</h5>
+                <h5 class="form-tit">cluster基础信息</h5>
                 <table>
                     <thead>
                     <tr>
-                        <th>id</th>
-                        <!--显示的字段 - 英文-->
-                        <th>ClusterId</th>
+                        <th>cluster_name</th>
+                        <th>cluster_uuid</th>
+                        <th>tagline</th>
                     </tr>
                     </thead>
                     <tr>
-                        <th>序号</th>
-                        <th>集群id</th>
+                        <th>集群名称</th>
+                        <th>集群UUID</th>
+                        <th>集群标签</th>
                     </tr>
 
                     <tbody>
                     <tr>
-                        <template v-if="clusterInfo.clusterId">
-                            <td>1</td>
+                        <template v-if="cluster.cluster_uuid">
                             <!--显示的字段 - 具体数据-->
-                            <td>{{clusterInfo.clusterId}}</td>
+                            <td>{{cluster.cluster_name}}</td>
+                            <td>{{cluster.cluster_uuid}}</td>
+                            <td>{{cluster.tagline}}</td>
                         </template>
                     </tr>
                     </tbody>
                 </table>
                 <hr>
-                <h5 class="form-tit">controller(kafka控制器,多个broker中选举一个)</h5>
+                <h5 class="form-tit">cluster版本信息</h5>
                 <table>
                     <thead>
                     <tr>
-                        <th>id</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>port</th>
-                        <th>topicSize</th>
-                        <th>consumerSize</th>
-                        <th>操作</th>
+                        <th>number</th>
+                        <th>build_flavor</th>
+                        <th>build_type</th>
+                        <th>build_hash</th>
+                        <th>build_date</th>
+                        <th>build_snapshot</th>
+                        <th>lucene_version</th>
+                        <th>minimum_wire_compatibility_version</th>
+                        <th>minimum_index_compatibility_version</th>
                     </tr>
                     </thead>
                     <tr>
-                        <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
-                        <th>topic数量</th>
-                        <th>consumer数量</th>
-                        <th>操作</th>
+                        <th>集群版本号</th>
+                        <th>构建分支</th>
+                        <th>构建类型</th>
+                        <th>构建hash</th>
+                        <th>集群构建日期</th>
+                        <th>是否是构建快照</th>
+                        <th>lucene版本</th>
+                        <th>wire兼容性</th>
+                        <th>index兼容性</th>
                     </tr>
                     <tbody>
                     <tr>
-                        <template v-if="clusterInfo.controller.host">
-                            <td>1</td>
-                            <td>{{clusterInfo.controller.id}}</td>
-                            <td>{{clusterInfo.controller.host}}</td>
-                            <td>{{clusterInfo.controller.port}}</td>
-                            <td>{{topicSize}}</td>
-                            <td>{{consumerSize}}</td>
-                            <td>
-                                <span @click="routerToConfigsView(bootstrap.servers)">查看Config</span>
-                                <span @click="routerToTopicManagerList(bootstrap.servers)">查看Topic</span>
-                                <span @click="routerToTopicPartitionOffsetList(bootstrap.servers)">查看TopicPartition</span>
-                                <span @click="routerToConsumerManagerList(bootstrap.servers)">查看Consumers</span>
-                            </td>
+                        <template v-if="cluster.version">
+                            <td>{{cluster.version.number}}</td>
+                            <td>{{cluster.version.build_flavor}}</td>
+                            <td>{{cluster.version.build_type}}</td>
+                            <td>{{cluster.version.build_hash}}</td>
+                            <td>{{cluster.version.build_date}}</td>
+                            <td>{{cluster.version.build_snapshot}}</td>
+                            <td>{{cluster.version.lucene_version}}</td>
+                            <td>{{cluster.version.minimum_wire_compatibility_version}}</td>
+                            <td>{{cluster.version.minimum_index_compatibility_version}}</td>
                         </template>
                     </tr>
                     </tbody>
@@ -122,14 +125,31 @@
     export default {
         data() {
             return {
+                cluster: {
+                    "name": "",
+                    "cluster_name": "",
+                    "cluster_uuid": "",
+                    "version": {
+                        "number": "",
+                        "build_flavor": "",
+                        "build_type": "",
+                        "build_hash": "",
+                        "build_date": "",
+                        "build_snapshot": false,
+                        "lucene_version": "",
+                        "minimum_wire_compatibility_version": "",
+                        "minimum_index_compatibility_version": ""
+                    },
+                    "tagline": ""
+                },
                 bootstrap: {
                     servers: '192.168.0.105:9092'
                 },
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
                 },
-                topicSize:0,
-                consumerSize:0,
+                topicSize: 0,
+                consumerSize: 0,
                 clusterInfo: {
                     controller: {
                         port: 9092,
@@ -155,6 +175,9 @@
         },
         created() {
             let self = this;
+            self.Cluster();
+
+            ///////
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
             self.clusterInfo.clusterId = '';
@@ -166,6 +189,34 @@
         },
         watch: {},
         methods: {//获取具体的配置
+            Cluster() {
+                let self = this;
+                self.$http.get(self.api.Cluster, {}, function (response) {
+                    if (response.code == 0) {
+                        self.cluster = response.content;
+                        self.$message({
+                            type: 'success',
+                            message: '查询成功',
+                            duration: 2000
+                        });
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                })
+
+            },
+
             queryBase() {
                 let self = this;
                 self.$http.get(self.api.getCluster, {

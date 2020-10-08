@@ -16,96 +16,58 @@
         </div>
         <div class="app-list">
             <div class="app-tab">
-                <h5 class="form-tit">cluster的信息</h5>
+                <hr>
+                <h5 class="form-tit">集群Segment信息</h5>
                 <table>
                     <thead>
                     <tr>
                         <th>id</th>
-                        <!--显示的字段 - 英文-->
-                        <th>ClusterId</th>
+                        <th>index</th>
+                        <th>shard</th>
+                        <th>segment</th>
+                        <th>prirep</th>
+                        <th>size</th>
+                        <th>size.memory</th>
+                        <th>docs.count</th>
+                        <th>docs.deleted</th>
+                        <th>searchable</th>
+                        <th>committed</th>
+                        <th>compound</th>
+                        <th>version</th>
                     </tr>
                     </thead>
                     <tr>
                         <th>序号</th>
-                        <th>集群id</th>
-                    </tr>
+                        <th>索引名称</th>
+                        <th>分片名称</th>
+                        <th>段的名称</th>
+                        <th>段的类型</th>
+                        <th>段占用的磁盘</th>
+                        <th>段占用的内存</th>
+                        <th>文档数量</th>
+                        <th>文档删除数量</th>
+                        <th>是否可检索</th>
+                        <th>是否提交</th>
+                        <th>是否组合</th>
+                        <th>编写段的版本</th>
 
-                    <tbody>
-                    <tr>
-                        <template v-if="clusterInfo.clusterId">
-                            <td>1</td>
-                            <!--显示的字段 - 具体数据-->
-                            <td>{{clusterInfo.clusterId}}</td>
-                        </template>
-                    </tr>
-                    </tbody>
-                </table>
-                <hr>
-                <h5 class="form-tit">controller(kafka控制器,多个broker中选举一个)</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>port</th>
-                        <th>topicSize</th>
-                        <th>consumerSize</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
-                        <th>topic数量</th>
-                        <th>consumer数量</th>
-                        <th>操作</th>
                     </tr>
                     <tbody>
-                    <tr>
-                        <template v-if="clusterInfo.controller.host">
-                            <td>1</td>
-                            <td>{{clusterInfo.controller.id}}</td>
-                            <td>{{clusterInfo.controller.host}}</td>
-                            <td>{{clusterInfo.controller.port}}</td>
-                            <td>{{topicSize}}</td>
-                            <td>{{consumerSize}}</td>
-                            <td>
-                                <span @click="routerToConfigsView(bootstrap.servers)">查看Config</span>
-                                <span @click="routerToTopicManagerList(bootstrap.servers)">查看Topic</span>
-                                <span @click="routerToTopicPartitionOffsetList(bootstrap.servers)">查看TopicPartition</span>
-                                <span @click="routerToConsumerManagerList(bootstrap.servers)">查看Consumers</span>
-                            </td>
-                        </template>
-                    </tr>
-                    </tbody>
-                </table>
-                <hr>
-                <h5 class="form-tit">Nodes(kafka的所有broker节点)</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>application.id</th>
-                        <th>port</th>
-                        <th>host</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
-                    </tr>
-                    <tbody>
-                    <template v-if="clusterInfo.nodes">
-                        <tr v-for="(info,index) in clusterInfo.nodes">
+                    <template v-if="Cluster_SegmentController_Cat_Segments_Format_Result">
+                        <tr v-for="(info,index) in Cluster_SegmentController_Cat_Segments_Format_Result">
                             <td>{{index+1}}</td>
-                            <td>{{info.id}}</td>
-                            <td>{{info.host}}</td>
-                            <td>{{info.port}}</td>
+                            <td>{{info.index}}</td>
+                            <td>{{info.shard}}</td>
+                            <td>{{info.segment}}</td>
+                            <td>{{info.prirep}}</td>
+                            <td>{{info.size}}</td>
+                            <td>{{info['size.memory']}}</td>
+                            <td>{{info['docs.count']}}</td>
+                            <td>{{info['docs.deleted']}}</td>
+                            <td>{{info.searchable}}</td>
+                            <td>{{info.committed}}</td>
+                            <td>{{info.compound}}</td>
+                            <td>{{info.version}}</td>
                         </tr>
                     </template>
                     </tbody>
@@ -118,18 +80,35 @@
 </template>
 
 <script>
-
     export default {
         data() {
             return {
+                Cluster_SegmentController_Cat_Segments_Format_Result: [
+                    {
+                        "committed": "true",//是否提交
+                        "compound": "true",//是否存储在复合文件中
+                        "docs.count": "32",//文档数量
+                        "docs.deleted": "0",//文档删除数量
+                        "generation": "0",//世代号，例如0。对于每个写入的段，Elasticsearch都会增加该世代号
+                        "index": "这个是样例数据",//索引
+                        "ip": "127.0.0.1",//ip
+                        "prirep": "p",//分片类型(主分片/)
+                        "searchable": "true",//是否可搜索
+                        "segment": "_0",//段的名称
+                        "shard": "0",//分片名称
+                        "size": "5.1kb",//段使用的磁盘空间
+                        "size.memory": "1716",//段使用的内存大小
+                        "version": "8.6.2"//编写段的Lucene版本
+                    }
+                ],
                 bootstrap: {
                     servers: '192.168.0.105:9092'
                 },
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
                 },
-                topicSize:0,
-                consumerSize:0,
+                topicSize: 0,
+                consumerSize: 0,
                 clusterInfo: {
                     controller: {
                         port: 9092,
@@ -155,6 +134,8 @@
         },
         created() {
             let self = this;
+            self.Cluster_SegmentController_Cat_Segments_Format();
+
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
             self.clusterInfo.clusterId = '';
@@ -165,7 +146,37 @@
 
         },
         watch: {},
-        methods: {//获取具体的配置
+        methods: {
+
+            //获取具体的配置
+            Cluster_SegmentController_Cat_Segments_Format() {
+                let self = this;
+                self.$http.get(self.api.Cluster_SegmentController_Cat_Segments_Format, {}, function (response) {
+                    if (response.code == 0) {
+                        self.Cluster_SegmentController_Cat_Segments_Format_Result = response.content;
+                        self.$message({
+                            type: 'success',
+                            message: '查询成功',
+                            duration: 2000
+                        });
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                })
+
+            },
+            //获取具体的配置
             queryBase() {
                 let self = this;
                 self.$http.get(self.api.getCluster, {

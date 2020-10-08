@@ -16,96 +16,39 @@
         </div>
         <div class="app-list">
             <div class="app-tab">
-                <h5 class="form-tit">cluster的信息</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <!--显示的字段 - 英文-->
-                        <th>ClusterId</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>集群id</th>
-                    </tr>
-
-                    <tbody>
-                    <tr>
-                        <template v-if="clusterInfo.clusterId">
-                            <td>1</td>
-                            <!--显示的字段 - 具体数据-->
-                            <td>{{clusterInfo.clusterId}}</td>
-                        </template>
-                    </tr>
-                    </tbody>
-                </table>
-                <hr>
-                <h5 class="form-tit">controller(kafka控制器,多个broker中选举一个)</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>port</th>
-                        <th>topicSize</th>
-                        <th>consumerSize</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
-                        <th>topic数量</th>
-                        <th>consumer数量</th>
-                        <th>操作</th>
-                    </tr>
-                    <tbody>
-                    <tr>
-                        <template v-if="clusterInfo.controller.host">
-                            <td>1</td>
-                            <td>{{clusterInfo.controller.id}}</td>
-                            <td>{{clusterInfo.controller.host}}</td>
-                            <td>{{clusterInfo.controller.port}}</td>
-                            <td>{{topicSize}}</td>
-                            <td>{{consumerSize}}</td>
-                            <td>
-                                <span @click="routerToConfigsView(bootstrap.servers)">查看Config</span>
-                                <span @click="routerToTopicManagerList(bootstrap.servers)">查看Topic</span>
-                                <span @click="routerToTopicPartitionOffsetList(bootstrap.servers)">查看TopicPartition</span>
-                                <span @click="routerToConsumerManagerList(bootstrap.servers)">查看Consumers</span>
-                            </td>
-                        </template>
-                    </tr>
-                    </tbody>
-                </table>
                 <hr>
                 <h5 class="form-tit">Nodes(kafka的所有broker节点)</h5>
                 <table>
                     <thead>
                     <tr>
                         <th>id</th>
-                        <th>application.id</th>
-                        <th>port</th>
-                        <th>host</th>
+                        <th>alias</th>
+                        <th>index</th>
+                        <th>routing.index</th>
+                        <th>routing.search</th>
+                        <th>filter</th>
+                        <th>is_write_index</th>
                     </tr>
                     </thead>
                     <tr>
                         <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
+                        <th>别名</th>
+                        <th>索引名称</th>
+                        <th>路由索引</th>
+                        <th>路由检索</th>
+                        <th>过滤</th>
+                        <th>是写索引</th>
                     </tr>
                     <tbody>
-                    <template v-if="clusterInfo.nodes">
-                        <tr v-for="(info,index) in clusterInfo.nodes">
+                    <template v-if="Cluster_AliasController_Cat_Aliases_Format_Result">
+                        <tr v-for="(info,index) in Cluster_AliasController_Cat_Aliases_Format_Result">
                             <td>{{index+1}}</td>
-                            <td>{{info.id}}</td>
-                            <td>{{info.host}}</td>
-                            <td>{{info.port}}</td>
+                            <td>{{info.alias}}</td>
+                            <td>{{info.index}}</td>
+                            <td>{{info['routing.index']}}</td>
+                            <td>{{info['routing.search']}}</td>
+                            <td>{{info.filter}}</td>
+                            <td>{{info.is_write_index.size}}</td>
                         </tr>
                     </template>
                     </tbody>
@@ -122,14 +65,24 @@
     export default {
         data() {
             return {
+                Cluster_AliasController_Cat_Aliases_Format_Result: [
+                    {
+                        "filter": "",
+                        "routing.index": "",
+                        "is_write_index": "",
+                        "alias": "",
+                        "index": "",
+                        "routing.search": ""
+                    }
+                ],
                 bootstrap: {
                     servers: '192.168.0.105:9092'
                 },
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
                 },
-                topicSize:0,
-                consumerSize:0,
+                topicSize: 0,
+                consumerSize: 0,
                 clusterInfo: {
                     controller: {
                         port: 9092,
@@ -155,6 +108,8 @@
         },
         created() {
             let self = this;
+            self.Cluster_AliasController_Cat_Aliases_Format();
+
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
             self.clusterInfo.clusterId = '';
@@ -165,7 +120,37 @@
 
         },
         watch: {},
-        methods: {//获取具体的配置
+        methods: {
+
+            //获取具体的配置
+            Cluster_AliasController_Cat_Aliases_Format() {
+                let self = this;
+                self.$http.get(self.api.Cluster_AliasController_Cat_Aliases_Format, {}, function (response) {
+                    if (response.code == 0) {
+                        self.Cluster_AliasController_Cat_Aliases_Format_Result = response.content;
+                        self.$message({
+                            type: 'success',
+                            message: '查询成功',
+                            duration: 2000
+                        });
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                })
+
+            },
+            //获取具体的配置
             queryBase() {
                 let self = this;
                 self.$http.get(self.api.getCluster, {

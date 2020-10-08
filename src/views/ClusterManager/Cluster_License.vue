@@ -16,100 +16,45 @@
         </div>
         <div class="app-list">
             <div class="app-tab">
-                <h5 class="form-tit">cluster的信息</h5>
+                <h5 class="form-tit">cluster证书信息</h5>
                 <table>
                     <thead>
                     <tr>
-                        <th>id</th>
-                        <!--显示的字段 - 英文-->
-                        <th>ClusterId</th>
+                        <!--<th>uid</th>-->
+                        <th>issue_date</th>
+                        <th>issued_to</th>
+                        <th>max_nodes</th>
+                        <th>type</th>
+                        <th>issuer</th>
+                        <th>status</th>
                     </tr>
                     </thead>
                     <tr>
-                        <th>序号</th>
-                        <th>集群id</th>
+                        <!--<th>UUID</th>-->
+                        <th>颁发日期</th>
+                        <th>颁发给</th>
+                        <th>最大的节点数</th>
+                        <th>类型</th>
+                        <th>颁发者</th>
+                        <th>状态</th>
                     </tr>
 
                     <tbody>
                     <tr>
-                        <template v-if="clusterInfo.clusterId">
-                            <td>1</td>
+                        <template v-if="Cluster_LicenseController_License_Result.license">
                             <!--显示的字段 - 具体数据-->
-                            <td>{{clusterInfo.clusterId}}</td>
+                            <!--<td>{{Cluster_LicenseController_License_Result.license.uid}}</td>-->
+                            <td>{{Cluster_LicenseController_License_Result.license.issue_date}}</td>
+                            <td>{{Cluster_LicenseController_License_Result.license.issued_to}}</td>
+                            <td>{{Cluster_LicenseController_License_Result.license.max_nodes}}</td>
+                            <td>{{Cluster_LicenseController_License_Result.license.type}}</td>
+                            <td>{{Cluster_LicenseController_License_Result.license.issuer}}</td>
+                            <td>{{Cluster_LicenseController_License_Result.license.status}}</td>
                         </template>
                     </tr>
                     </tbody>
                 </table>
                 <hr>
-                <h5 class="form-tit">controller(kafka控制器,多个broker中选举一个)</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>port</th>
-                        <th>topicSize</th>
-                        <th>consumerSize</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
-                        <th>topic数量</th>
-                        <th>consumer数量</th>
-                        <th>操作</th>
-                    </tr>
-                    <tbody>
-                    <tr>
-                        <template v-if="clusterInfo.controller.host">
-                            <td>1</td>
-                            <td>{{clusterInfo.controller.id}}</td>
-                            <td>{{clusterInfo.controller.host}}</td>
-                            <td>{{clusterInfo.controller.port}}</td>
-                            <td>{{topicSize}}</td>
-                            <td>{{consumerSize}}</td>
-                            <td>
-                                <span @click="routerToConfigsView(bootstrap.servers)">查看Config</span>
-                                <span @click="routerToTopicManagerList(bootstrap.servers)">查看Topic</span>
-                                <span @click="routerToTopicPartitionOffsetList(bootstrap.servers)">查看TopicPartition</span>
-                                <span @click="routerToConsumerManagerList(bootstrap.servers)">查看Consumers</span>
-                            </td>
-                        </template>
-                    </tr>
-                    </tbody>
-                </table>
-                <hr>
-                <h5 class="form-tit">Nodes(kafka的所有broker节点)</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>application.id</th>
-                        <th>port</th>
-                        <th>host</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
-                    </tr>
-                    <tbody>
-                    <template v-if="clusterInfo.nodes">
-                        <tr v-for="(info,index) in clusterInfo.nodes">
-                            <td>{{index+1}}</td>
-                            <td>{{info.id}}</td>
-                            <td>{{info.host}}</td>
-                            <td>{{info.port}}</td>
-                        </tr>
-                    </template>
-                    </tbody>
-                </table>
             </div>
         </div>
 
@@ -122,14 +67,27 @@
     export default {
         data() {
             return {
+                Cluster_LicenseController_License_Result: {
+                    "license": {
+                        "uid": "",
+                        "issue_date": "",
+                        "start_date_in_millis": 0,
+                        "issued_to": "",
+                        "max_nodes": 0,
+                        "issue_date_in_millis": 0,
+                        "type": "",
+                        "issuer": "",
+                        "status": ""
+                    }
+                },
                 bootstrap: {
                     servers: '192.168.0.105:9092'
                 },
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
                 },
-                topicSize:0,
-                consumerSize:0,
+                topicSize: 0,
+                consumerSize: 0,
                 clusterInfo: {
                     controller: {
                         port: 9092,
@@ -155,6 +113,9 @@
         },
         created() {
             let self = this;
+            self.Cluster_LicenseController_License();
+
+            ///////
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
             self.clusterInfo.clusterId = '';
@@ -166,6 +127,34 @@
         },
         watch: {},
         methods: {//获取具体的配置
+            Cluster_LicenseController_License() {
+                let self = this;
+                self.$http.get(self.api.Cluster_LicenseController_License, {}, function (response) {
+                    if (response.code == 0) {
+                        self.Cluster_LicenseController_License_Result = response.content;
+                        self.$message({
+                            type: 'success',
+                            message: '查询成功',
+                            duration: 2000
+                        });
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                })
+
+            },
+
             queryBase() {
                 let self = this;
                 self.$http.get(self.api.getCluster, {

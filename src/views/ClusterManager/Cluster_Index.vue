@@ -16,96 +16,51 @@
         </div>
         <div class="app-list">
             <div class="app-tab">
-                <h5 class="form-tit">cluster的信息</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <!--显示的字段 - 英文-->
-                        <th>ClusterId</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>集群id</th>
-                    </tr>
-
-                    <tbody>
-                    <tr>
-                        <template v-if="clusterInfo.clusterId">
-                            <td>1</td>
-                            <!--显示的字段 - 具体数据-->
-                            <td>{{clusterInfo.clusterId}}</td>
-                        </template>
-                    </tr>
-                    </tbody>
-                </table>
-                <hr>
-                <h5 class="form-tit">controller(kafka控制器,多个broker中选举一个)</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>port</th>
-                        <th>topicSize</th>
-                        <th>consumerSize</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
-                        <th>topic数量</th>
-                        <th>consumer数量</th>
-                        <th>操作</th>
-                    </tr>
-                    <tbody>
-                    <tr>
-                        <template v-if="clusterInfo.controller.host">
-                            <td>1</td>
-                            <td>{{clusterInfo.controller.id}}</td>
-                            <td>{{clusterInfo.controller.host}}</td>
-                            <td>{{clusterInfo.controller.port}}</td>
-                            <td>{{topicSize}}</td>
-                            <td>{{consumerSize}}</td>
-                            <td>
-                                <span @click="routerToConfigsView(bootstrap.servers)">查看Config</span>
-                                <span @click="routerToTopicManagerList(bootstrap.servers)">查看Topic</span>
-                                <span @click="routerToTopicPartitionOffsetList(bootstrap.servers)">查看TopicPartition</span>
-                                <span @click="routerToConsumerManagerList(bootstrap.servers)">查看Consumers</span>
-                            </td>
-                        </template>
-                    </tr>
-                    </tbody>
-                </table>
                 <hr>
                 <h5 class="form-tit">Nodes(kafka的所有broker节点)</h5>
                 <table>
                     <thead>
                     <tr>
                         <th>id</th>
-                        <th>application.id</th>
-                        <th>port</th>
-                        <th>host</th>
+                        <th>index</th>
+                        <th>health</th>
+                        <th>pri</th>
+                        <th>pri.store.size</th>
+                        <th>rep</th>
+                        <th>store.size</th>
+                        <th>status</th>
+                        <th>docs.count</th>
+                        <th>docs.deleted</th>
+                        <th>uuid</th>
                     </tr>
                     </thead>
                     <tr>
                         <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
+                        <th>索引名称</th>
+                        <th>健康状况</th>
+                        <th>主分片数量</th>
+                        <th>主分片存储</th>
+                        <th>复制</th>
+                        <th>存储</th>
+                        <th>状态</th>
+                        <th>文档数量</th>
+                        <th>文档删除数量</th>
+                        <th>uuid</th>
                     </tr>
                     <tbody>
-                    <template v-if="clusterInfo.nodes">
-                        <tr v-for="(info,index) in clusterInfo.nodes">
+                    <template v-if="Cluster_IndexController_Cat_Indices_Format_Result">
+                        <tr v-for="(info,index) in Cluster_IndexController_Cat_Indices_Format_Result">
                             <td>{{index+1}}</td>
-                            <td>{{info.id}}</td>
-                            <td>{{info.host}}</td>
-                            <td>{{info.port}}</td>
+                            <td>{{info.index}}</td>
+                            <td>{{info.health}}</td>
+                            <td>{{info.pri}}</td>
+                            <td>{{info['pri.store.size']}}</td>
+                            <td>{{info.rep}}</td>
+                            <td>{{info['store.size']}}</td>
+                            <td>{{info.status}}</td>
+                            <td>{{info['docs.count']}}</td>
+                            <td>{{info['docs.deleted']}}</td>
+                            <td>{{info.uuid}}</td>
                         </tr>
                     </template>
                     </tbody>
@@ -122,14 +77,28 @@
     export default {
         data() {
             return {
+                Cluster_IndexController_Cat_Indices_Format_Result: [
+                    {
+                        "pri.store.size": "",
+                        "docs.deleted": "",
+                        "pri": "",
+                        "health": "",
+                        "index": "",
+                        "rep": "",
+                        "uuid": "",
+                        "store.size": "",
+                        "status": "",
+                        "docs.count": ""
+                    }
+                ],
                 bootstrap: {
                     servers: '192.168.0.105:9092'
                 },
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
                 },
-                topicSize:0,
-                consumerSize:0,
+                topicSize: 0,
+                consumerSize: 0,
                 clusterInfo: {
                     controller: {
                         port: 9092,
@@ -155,6 +124,8 @@
         },
         created() {
             let self = this;
+            self.Cluster_IndexController_Cat_Indices_Format();
+
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
             self.clusterInfo.clusterId = '';
@@ -165,7 +136,37 @@
 
         },
         watch: {},
-        methods: {//获取具体的配置
+        methods: {
+
+            //获取具体的配置
+            Cluster_IndexController_Cat_Indices_Format() {
+                let self = this;
+                self.$http.get(self.api.Cluster_IndexController_Cat_Indices_Format, {}, function (response) {
+                    if (response.code == 0) {
+                        self.Cluster_IndexController_Cat_Indices_Format_Result = response.content;
+                        self.$message({
+                            type: 'success',
+                            message: '查询成功',
+                            duration: 2000
+                        });
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                })
+
+            },
+            //获取具体的配置
             queryBase() {
                 let self = this;
                 self.$http.get(self.api.getCluster, {

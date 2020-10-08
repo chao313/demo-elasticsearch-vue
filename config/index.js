@@ -16,7 +16,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/demo_elasticsearch': {
-                target: 'http://127.0.0.1:8787/demo_elasticsearch/',
+                target: 'http://127.0.0.1:9000/demo_elasticsearch/',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/demo_elasticsearch': '/' // 这里理解成用‘/api’代替target里面的地址，组件中我们调接口时直接用/api代替
