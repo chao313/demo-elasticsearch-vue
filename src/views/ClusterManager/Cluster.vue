@@ -85,34 +85,6 @@
                     </tr>
                     </tbody>
                 </table>
-                <hr>
-                <h5 class="form-tit">Nodes(kafka的所有broker节点)</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>application.id</th>
-                        <th>port</th>
-                        <th>host</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>application.id</th>
-                        <th>host</th>
-                        <th>端口号</th>
-                    </tr>
-                    <tbody>
-                    <template v-if="clusterInfo.nodes">
-                        <tr v-for="(info,index) in clusterInfo.nodes">
-                            <td>{{index+1}}</td>
-                            <td>{{info.id}}</td>
-                            <td>{{info.host}}</td>
-                            <td>{{info.port}}</td>
-                        </tr>
-                    </template>
-                    </tbody>
-                </table>
             </div>
         </div>
 

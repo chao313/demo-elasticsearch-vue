@@ -32,6 +32,7 @@
                         <th>docs.count</th>
                         <th>docs.deleted</th>
                         <th>uuid</th>
+                        <th>操作</th>
                     </tr>
                     </thead>
                     <tr>
@@ -46,10 +47,11 @@
                         <th>文档数量</th>
                         <th>文档删除数量</th>
                         <th>uuid</th>
+                        <th>操作</th>
                     </tr>
                     <tbody>
-                    <template v-if="Cluster_IndexController_Cat_Indices_Format_Result">
-                        <tr v-for="(info,index) in Cluster_IndexController_Cat_Indices_Format_Result">
+                    <template v-if="Cluster_IndexController_Cat_Indices_Result">
+                        <tr v-for="(info,index) in Cluster_IndexController_Cat_Indices_Result">
                             <td>{{index+1}}</td>
                             <td>{{info.index}}</td>
                             <td>{{info.health}}</td>
@@ -61,6 +63,20 @@
                             <td>{{info['docs.count']}}</td>
                             <td>{{info['docs.deleted']}}</td>
                             <td>{{info.uuid}}</td>
+                            <td>
+                                <span @click="routerToDetailView(info.index)">详情</span>
+                                <span @click="preByFileName(info.preRelationViewUrl)">别名</span>
+                                <span @click="preByFileName(info.preRelationViewUrl)">文档操作</span>
+                                <span @click="downloadByFileName(info.downloadUrl)">映射</span>
+                                <span @click="routerToView(info.fileName)">冻结/解冻</span>
+                                <span @click="copy(info.preRelationViewUrl)">打开/关闭</span>
+                                <span @click="copy(info.preRelationViewUrl)">fresh</span>
+                                <span @click="copy(info.preRelationViewUrl)">flush</span>
+                                <span @click="copy(info.preRelationViewUrl)">分片</span>
+                                <span @click="copy(info.preRelationViewUrl)">段</span>
+                                <span @click="copy(info.preRelationViewUrl)">恢复</span>
+                                <span @click="copy(info.preRelationViewUrl)">设置</span>
+                            </td>
                         </tr>
                     </template>
                     </tbody>
@@ -77,7 +93,7 @@
     export default {
         data() {
             return {
-                Cluster_IndexController_Cat_Indices_Format_Result: [
+                Cluster_IndexController_Cat_Indices_Result: [
                     {
                         "pri.store.size": "",
                         "docs.deleted": "",
@@ -124,7 +140,7 @@
         },
         created() {
             let self = this;
-            self.Cluster_IndexController_Cat_Indices_Format();
+            self.Cluster_IndexController_Cat_Indices();
 
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
@@ -139,11 +155,15 @@
         methods: {
 
             //获取具体的配置
-            Cluster_IndexController_Cat_Indices_Format() {
+            Cluster_IndexController_Cat_Indices() {
                 let self = this;
-                self.$http.get(self.api.Cluster_IndexController_Cat_Indices_Format, {}, function (response) {
+                self.$http.get(self.api.Cluster_IndexController_Cat_Indices, {
+                    params: {
+                        'format': 'JSON'
+                    }
+                }, function (response) {
                     if (response.code == 0) {
-                        self.Cluster_IndexController_Cat_Indices_Format_Result = response.content;
+                        self.Cluster_IndexController_Cat_Indices_Result = response.content;
                         self.$message({
                             type: 'success',
                             message: '查询成功',
@@ -375,6 +395,11 @@
                 let queryStr = "";
                 queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
                 window.open("#/ConsumerManagerList" + "?" + queryStr, '_self');
+            },
+            routerToDetailView(index) {
+                let queryStr = "";
+                queryStr = queryStr + "index=" + index + "";
+                window.open("#/IndexManager_Index" + "?" + queryStr, '_self');
             }
             ,
             searchEvent() {

@@ -40,15 +40,15 @@
                         <th>是写索引</th>
                     </tr>
                     <tbody>
-                    <template v-if="Cluster_AliasController_Cat_Aliases_Format_Result">
-                        <tr v-for="(info,index) in Cluster_AliasController_Cat_Aliases_Format_Result">
+                    <template v-if="Cluster_AliasController_Cat_Aliases_Result">
+                        <tr v-for="(info,index) in Cluster_AliasController_Cat_Aliases_Result">
                             <td>{{index+1}}</td>
                             <td>{{info.alias}}</td>
                             <td>{{info.index}}</td>
                             <td>{{info['routing.index']}}</td>
                             <td>{{info['routing.search']}}</td>
                             <td>{{info.filter}}</td>
-                            <td>{{info.is_write_index.size}}</td>
+                            <td>{{info.is_write_index}}</td>
                         </tr>
                     </template>
                     </tbody>
@@ -65,7 +65,7 @@
     export default {
         data() {
             return {
-                Cluster_AliasController_Cat_Aliases_Format_Result: [
+                Cluster_AliasController_Cat_Aliases_Result: [
                     {
                         "filter": "",
                         "routing.index": "",
@@ -108,7 +108,7 @@
         },
         created() {
             let self = this;
-            self.Cluster_AliasController_Cat_Aliases_Format();
+            self.Cluster_AliasController_Cat_Aliases();
 
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
@@ -123,11 +123,15 @@
         methods: {
 
             //获取具体的配置
-            Cluster_AliasController_Cat_Aliases_Format() {
+            Cluster_AliasController_Cat_Aliases() {
                 let self = this;
-                self.$http.get(self.api.Cluster_AliasController_Cat_Aliases_Format, {}, function (response) {
+                self.$http.get(self.api.Cluster_AliasController_Cat_Aliases, {
+                    params: {
+                        'format': 'JSON'
+                    }
+                }, function (response) {
                     if (response.code == 0) {
-                        self.Cluster_AliasController_Cat_Aliases_Format_Result = response.content;
+                        self.Cluster_AliasController_Cat_Aliases_Result = response.content;
                         self.$message({
                             type: 'success',
                             message: '查询成功',

@@ -53,8 +53,8 @@
 
                     </tr>
                     <tbody>
-                    <template v-if="Cluster_NodeController_Cat_Nodes_Format_Result">
-                        <tr v-for="(info,index) in Cluster_NodeController_Cat_Nodes_Format_Result">
+                    <template v-if="Cluster_NodeController_Cat_Nodes_Result">
+                        <tr v-for="(info,index) in Cluster_NodeController_Cat_Nodes_Result">
                             <td>{{index+1}}</td>
                             <td>{{info.id}}</td>
                             <td>{{info.name}}</td>
@@ -83,7 +83,7 @@
     export default {
         data() {
             return {
-                Cluster_NodeController_Cat_Nodes_Format_Result: [
+                Cluster_NodeController_Cat_Nodes_Result: [
                     {
                         "build": "d34da0ea4a966c4e49417f2da2f244e3e97b4e6e",//Elasticsearch构建哈希
                         "completion.size": "0b",//完成大小
@@ -207,7 +207,7 @@
         },
         created() {
             let self = this;
-            self.Cluster_NodeController_Cat_Nodes_Format();
+            self.Cluster_NodeController_Cat_Nodes();
 
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
@@ -222,11 +222,16 @@
         methods: {
 
             //获取具体的配置
-            Cluster_NodeController_Cat_Nodes_Format() {
+            Cluster_NodeController_Cat_Nodes() {
                 let self = this;
-                self.$http.get(self.api.Cluster_NodeController_Cat_Nodes_Format, {}, function (response) {
+                self.$http.get(self.api.Cluster_NodeController_Cat_Nodes, {
+                    params: {
+                        'format': 'JSON',
+                        'h':'*'
+                    }
+                }, function (response) {
                     if (response.code == 0) {
-                        self.Cluster_NodeController_Cat_Nodes_Format_Result = response.content;
+                        self.Cluster_NodeController_Cat_Nodes_Result = response.content;
                         self.$message({
                             type: 'success',
                             message: '查询成功',

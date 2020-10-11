@@ -47,8 +47,8 @@
 
                     </tr>
                     <tbody>
-                    <template v-if="Cluster_ShardController_Cat_Shards_Format_Result">
-                        <tr v-for="(info,index) in Cluster_ShardController_Cat_Shards_Format_Result">
+                    <template v-if="Cluster_ShardController_Cat_Shards_Result">
+                        <tr v-for="(info,index) in Cluster_ShardController_Cat_Shards_Result">
                             <td>{{index+1}}</td>
                             <td>{{info.ip}}</td>
                             <td>{{info.node}}</td>
@@ -74,7 +74,7 @@
     export default {
         data() {
             return {
-                Cluster_ShardController_Cat_Shards_Format_Result: [
+                Cluster_ShardController_Cat_Shards_Result: [
                     {
                         "completion.size": "0b",//完成大小
                         "docs": "20",//分片中的文档数
@@ -182,7 +182,7 @@
         },
         created() {
             let self = this;
-            self.Cluster_ShardController_Cat_Shards_Format();
+            self.Cluster_ShardController_Cat_Shards();
 
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
@@ -197,11 +197,16 @@
         methods: {
 
             //获取具体的配置
-            Cluster_ShardController_Cat_Shards_Format() {
+            Cluster_ShardController_Cat_Shards() {
                 let self = this;
-                self.$http.get(self.api.Cluster_ShardController_Cat_Shards_Format, {}, function (response) {
+                self.$http.get(self.api.Cluster_ShardController_Cat_Shards, {
+                    params: {
+                        'format': 'JSON',
+                        'h':'*'
+                    }
+                }, function (response) {
                     if (response.code == 0) {
-                        self.Cluster_ShardController_Cat_Shards_Format_Result = response.content;
+                        self.Cluster_ShardController_Cat_Shards_Result = response.content;
                         self.$message({
                             type: 'success',
                             message: '查询成功',
