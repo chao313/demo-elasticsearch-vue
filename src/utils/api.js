@@ -11,11 +11,13 @@ export default {
     "Cluster_LicenseController_License": BASE_URL + '/Cluster_LicenseController/_license',
     "Cluster_NodeController_Cat_Nodes": BASE_URL + '/Cluster_NodeController/_cat/nodes',
     "Cluster_SegmentController_Cat_Segments": BASE_URL + '/Cluster_SegmentController/_cat/segments',
-    "Index_Cat_Count": BASE_URL + '/Index/_cat/count/',
 
+    "Cluster_ShardController_Cat_Shards": BASE_URL + '/Cluster_ShardController/_cat/shards',
 
     /** Index */
-    "Cluster_ShardController_Cat_Shards": BASE_URL + '/Cluster_ShardController/_cat/shards',
+    "Index_Cat_Count": BASE_URL + '/Index/_cat/count/',
+    "Index_Cat_Indices": BASE_URL + '/Index/_cat/indices/',
+    "Index_MappingController_Mapping_Compatible": BASE_URL + '/Index_MappingController/', //Index_MappingController/tb_object_0088/_mapping/compatible
 
     /** 资源管理 */
 

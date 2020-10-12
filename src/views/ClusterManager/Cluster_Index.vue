@@ -31,7 +31,7 @@
                         <th>status</th>
                         <th>docs.count</th>
                         <th>docs.deleted</th>
-                        <th>uuid</th>
+<!--                        <th>uuid</th>-->
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -62,12 +62,12 @@
                             <td>{{info.status}}</td>
                             <td>{{info['docs.count']}}</td>
                             <td>{{info['docs.deleted']}}</td>
-                            <td>{{info.uuid}}</td>
+<!--                            <td>{{info.uuid}}</td>-->
                             <td>
                                 <span @click="routerToDetailView(info.index)">详情</span>
                                 <span @click="preByFileName(info.preRelationViewUrl)">别名</span>
                                 <span @click="preByFileName(info.preRelationViewUrl)">文档操作</span>
-                                <span @click="downloadByFileName(info.downloadUrl)">映射</span>
+                                <span @click="routerToMappingView(info.index)">映射</span>
                                 <span @click="routerToView(info.fileName)">冻结/解冻</span>
                                 <span @click="copy(info.preRelationViewUrl)">打开/关闭</span>
                                 <span @click="copy(info.preRelationViewUrl)">fresh</span>
@@ -400,6 +400,11 @@
                 let queryStr = "";
                 queryStr = queryStr + "index=" + index + "";
                 window.open("#/IndexManager_Index" + "?" + queryStr, '_self');
+            },
+            routerToMappingView(index) {
+                let queryStr = "";
+                queryStr = queryStr + "index=" + index + "";
+                window.open("#/IndexManager_Index_Mapping" + "?" + queryStr, '_self');
             }
             ,
             searchEvent() {
