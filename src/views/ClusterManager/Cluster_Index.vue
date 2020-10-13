@@ -31,7 +31,7 @@
                         <th>status</th>
                         <th>docs.count</th>
                         <th>docs.deleted</th>
-<!--                        <th>uuid</th>-->
+                        <!-- <th>uuid</th>-->
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -46,7 +46,7 @@
                         <th>状态</th>
                         <th>文档数量</th>
                         <th>文档删除数量</th>
-                        <th>uuid</th>
+                        <!-- <th>uuid</th>-->
                         <th>操作</th>
                     </tr>
                     <tbody>
@@ -62,20 +62,26 @@
                             <td>{{info.status}}</td>
                             <td>{{info['docs.count']}}</td>
                             <td>{{info['docs.deleted']}}</td>
-<!--                            <td>{{info.uuid}}</td>-->
+                            <!--<td>{{info.uuid}}</td>-->
                             <td>
                                 <span @click="routerToDetailView(info.index)">详情</span>
                                 <span @click="preByFileName(info.preRelationViewUrl)">别名</span>
-                                <span @click="preByFileName(info.preRelationViewUrl)">文档操作</span>
+                                <span @click="routerToDocumentView(info.index)">文档</span>
                                 <span @click="routerToMappingView(info.index)">映射</span>
-                                <span @click="routerToView(info.fileName)">冻结/解冻</span>
-                                <span @click="copy(info.preRelationViewUrl)">打开/关闭</span>
-                                <span @click="copy(info.preRelationViewUrl)">fresh</span>
-                                <span @click="copy(info.preRelationViewUrl)">flush</span>
-                                <span @click="copy(info.preRelationViewUrl)">分片</span>
-                                <span @click="copy(info.preRelationViewUrl)">段</span>
-                                <span @click="copy(info.preRelationViewUrl)">恢复</span>
-                                <span @click="copy(info.preRelationViewUrl)">设置</span>
+                                <span @click="routerToView(info.index)">冻结/解冻</span>
+                                <template v-if="info.status=='open'">
+                                <span @click="Index_OpenCloseController_Close(info.index)">
+                                    <span class="red">关闭</span></span>
+                                </template>
+                                <template v-else>
+                                    <span class="redSpan" @click="Index_OpenCloseController_Open(info.index)">打开</span>
+                                </template>
+                                <span @click="Index_FreshFlushController_Refresh(info.index)">refresh</span>
+                                <span @click="Index_FreshFlushController_Flush(info.index)">flush</span>
+                                <span @click="routerToShardView(info.index)">分片</span>
+                                <span @click="routerToSegmentView(info.index)">段</span>
+                                <span @click="copy(info.index)">恢复</span>
+                                <span @click="copy(info.index)">设置</span>
                             </td>
                         </tr>
                     </template>
@@ -154,7 +160,7 @@
         watch: {},
         methods: {
 
-            //获取具体的配置
+            //获取全部的索引
             Cluster_IndexController_Cat_Indices() {
                 let self = this;
                 self.$http.get(self.api.Cluster_IndexController_Cat_Indices, {
@@ -185,6 +191,134 @@
                     });
                 })
 
+            },
+            Index_OpenCloseController_Close(index) {
+                this.$confirm('是否关闭该条索引？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    center: true
+                }).then(() => {
+                    let self = this;
+                    self.$http.post(self.api.Index_OpenCloseController_Close + "/" + index + "/_close", {}, {}, function (response) {
+                        if (response.code == 0) {
+                            self.$message({
+                                type: 'success',
+                                message: '关闭成功',
+                                duration: 2000
+                            });
+                            self.Cluster_IndexController_Cat_Indices();
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    });
+                });
+            },
+            Index_OpenCloseController_Open(index) {
+                this.$confirm('是否打开该条索引？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    center: true
+                }).then(() => {
+                    let self = this;
+                    self.$http.post(self.api.Index_OpenCloseController_Open + "/" + index + "/_open", {}, {}, function (response) {
+                        if (response.code == 0) {
+                            self.$message({
+                                type: 'success',
+                                message: '打开成功',
+                                duration: 2000
+                            });
+                            self.Cluster_IndexController_Cat_Indices();
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    })
+                });
+            },
+            Index_FreshFlushController_Refresh(index) {
+                this.$confirm('是否refresh该条索引？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    center: true
+                }).then(() => {
+                    let self = this;
+                    self.$http.get(self.api.Index_FreshFlushController_Refresh + "/" + index + "/_refresh", {}, function (response) {
+                        if (response.code == 0) {
+                            self.$message({
+                                type: 'success',
+                                message: 'refresh成功',
+                                duration: 2000
+                            });
+                            self.Cluster_IndexController_Cat_Indices();
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    })
+                });
+            },
+            Index_FreshFlushController_Flush(index) {
+                this.$confirm('是否flush该条索引？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    center: true
+                }).then(() => {
+                    let self = this;
+                    self.$http.get(self.api.Index_FreshFlushController_Flush + "/" + index + "/_flush", {}, function (response) {
+                        if (response.code == 0) {
+                            self.$message({
+                                type: 'success',
+                                message: 'refresh成功',
+                                duration: 2000
+                            });
+                            self.Cluster_IndexController_Cat_Indices();
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    })
+                });
             },
             //获取具体的配置
             queryBase() {
@@ -301,8 +435,7 @@
                                 message: '查询成功',
                                 duration: 2000
                             });
-                        }
-                        else {
+                        } else {
                             self.$message({
                                 type: 'error',
                                 message: response.msg,
@@ -405,6 +538,23 @@
                 let queryStr = "";
                 queryStr = queryStr + "index=" + index + "";
                 window.open("#/IndexManager_Index_Mapping" + "?" + queryStr, '_self');
+            },
+            routerToDocumentView(index) {
+                let queryStr = "";
+                queryStr = queryStr + "index=" + index + "";
+                window.open("#/IndexManager_Index_Document" + "?" + queryStr, '_self');
+            }
+            ,
+            routerToShardView(index) {
+                let queryStr = "";
+                queryStr = queryStr + "index=" + index + "";
+                window.open("#/IndexManager_Index_Shard" + "?" + queryStr, '_self');
+            }
+            ,
+            routerToSegmentView(index) {
+                let queryStr = "";
+                queryStr = queryStr + "index=" + index + "";
+                window.open("#/IndexManager_Index_Segment" + "?" + queryStr, '_self');
             }
             ,
             searchEvent() {
@@ -446,5 +596,10 @@
             color: #888;
         }
 
+    }
+
+    .red {
+        color: #b21f2d !important;
+        /*font-size: 100px;*/
     }
 </style>

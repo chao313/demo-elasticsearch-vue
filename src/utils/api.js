@@ -18,6 +18,15 @@ export default {
     "Index_Cat_Count": BASE_URL + '/Index/_cat/count/',
     "Index_Cat_Indices": BASE_URL + '/Index/_cat/indices/',
     "Index_MappingController_Mapping_Compatible": BASE_URL + '/Index_MappingController/', //Index_MappingController/tb_object_0088/_mapping/compatible
+    "Index_OpenCloseController_Close": BASE_URL + '/Index_OpenCloseController/', //Index_OpenCloseController/tb_object_0088/_close
+    "Index_OpenCloseController_Open": BASE_URL + '/Index_OpenCloseController/', //Index_OpenCloseController/tb_object_0088/_open
+    "Index_FreshFlushController_Refresh": BASE_URL + '/Index_FreshFlushController/', //Index_OpenCloseController/tb_object_0088/_refresh
+    "Index_FreshFlushController_Flush": BASE_URL + '/Index_FreshFlushController/', //Index_OpenCloseController/tb_object_0088/_flush
+    "Index_ShardController_Cat_Shards": BASE_URL + '/Index_ShardController/_cat/shards/', //Index_ShardController/_cat/shards/index_bulk?h=*&format=JSON
+    "Index_SegmentController_Cat_Segments": BASE_URL + '/Index_SegmentController/_cat/segments/', //Index_SegmentController/cat/segments/test2?v=true&format=JSON
+
+    /** Search */
+    "Search_DSL_MatchAllController_Search": BASE_URL + '/Search_DSL_MatchAllController/',//Search_DSL_MatchAllController/tb_object_0088/_search
 
     /** 资源管理 */
 

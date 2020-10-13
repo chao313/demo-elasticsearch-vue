@@ -61,16 +61,7 @@
         data() {
             return {
                 index: '样例数据',
-                Index_MappingController_Mapping_Compatible_Result: {
-                    "F24_0088": {
-                        "type": "text",
-                        "fields": {
-                            "keyword": {
-                                "ignore_above": 256,
-                                "type": "keyword"
-                            }
-                        }
-                    },
+                Index_MappingController_Mapping_Compatible_Result: {//不同版本之间的格式相对有差别
                     "F24_0088": {
                         "type": "text",
                         "fields": {

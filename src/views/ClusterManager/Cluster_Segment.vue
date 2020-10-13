@@ -53,8 +53,8 @@
 
                     </tr>
                     <tbody>
-                    <template v-if="Cluster_SegmentController_Cat_Segments_Format_Result">
-                        <tr v-for="(info,index) in Cluster_SegmentController_Cat_Segments_Format_Result">
+                    <template v-if="Cluster_SegmentController_Cat_Segments_Result">
+                        <tr v-for="(info,index) in Cluster_SegmentController_Cat_Segments_Result">
                             <td>{{index+1}}</td>
                             <td>{{info.index}}</td>
                             <td>{{info.shard}}</td>
@@ -83,7 +83,7 @@
     export default {
         data() {
             return {
-                Cluster_SegmentController_Cat_Segments_Format_Result: [
+                Cluster_SegmentController_Cat_Segments_Result: [
                     {
                         "committed": "true",//是否提交
                         "compound": "true",//是否存储在复合文件中
@@ -134,7 +134,7 @@
         },
         created() {
             let self = this;
-            self.Cluster_SegmentController_Cat_Segments_Format();
+            self.Cluster_SegmentController_Cat_Segments();
 
             self.clusterInfo.controller = {};
             self.clusterInfo.nodes = {};
@@ -149,11 +149,16 @@
         methods: {
 
             //获取具体的配置
-            Cluster_SegmentController_Cat_Segments_Format() {
+            Cluster_SegmentController_Cat_Segments() {
                 let self = this;
-                self.$http.get(self.api.Cluster_SegmentController_Cat_Segments_Format, {}, function (response) {
+                self.$http.get(self.api.Cluster_SegmentController_Cat_Segments, {
+                    params: {
+                        'format': 'JSON',
+                        'h': '*'
+                    }
+                }, function (response) {
                     if (response.code == 0) {
-                        self.Cluster_SegmentController_Cat_Segments_Format_Result = response.content;
+                        self.Cluster_SegmentController_Cat_Segments_Result = response.content;
                         self.$message({
                             type: 'success',
                             message: '查询成功',
@@ -291,8 +296,7 @@
                                 message: '查询成功',
                                 duration: 2000
                             });
-                        }
-                        else {
+                        } else {
                             self.$message({
                                 type: 'error',
                                 message: response.msg,
