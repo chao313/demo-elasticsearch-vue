@@ -81,7 +81,7 @@
                                 <span @click="routerToShardView(info.index)">分片</span>
                                 <span @click="routerToSegmentView(info.index)">段</span>
                                 <span @click="copy(info.index)">恢复</span>
-                                <span @click="copy(info.index)">设置</span>
+                                <span @click="routerToSettingView(info.index)">设置</span>
                             </td>
                         </tr>
                     </template>
@@ -555,6 +555,12 @@
                 let queryStr = "";
                 queryStr = queryStr + "index=" + index + "";
                 window.open("#/IndexManager_Index_Segment" + "?" + queryStr, '_self');
+            }
+            ,
+            routerToSettingView(index) {
+                let queryStr = "";
+                queryStr = queryStr + "index=" + index + "";
+                window.open("#/IndexManager_Index_Setting" + "?" + queryStr, '_self');
             }
             ,
             searchEvent() {

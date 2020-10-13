@@ -24,6 +24,7 @@ export default {
     "Index_FreshFlushController_Flush": BASE_URL + '/Index_FreshFlushController/', //Index_OpenCloseController/tb_object_0088/_flush
     "Index_ShardController_Cat_Shards": BASE_URL + '/Index_ShardController/_cat/shards/', //Index_ShardController/_cat/shards/index_bulk?h=*&format=JSON
     "Index_SegmentController_Cat_Segments": BASE_URL + '/Index_SegmentController/_cat/segments/', //Index_SegmentController/cat/segments/test2?v=true&format=JSON
+    "Index_SettingController_Settings": BASE_URL + '/Index_SettingController/', //Index_SettingController/test2/_settings
 
     /** Search */
     "Search_DSL_MatchAllController_Search": BASE_URL + '/Search_DSL_MatchAllController/',//Search_DSL_MatchAllController/tb_object_0088/_search
