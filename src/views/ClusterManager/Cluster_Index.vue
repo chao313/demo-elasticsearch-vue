@@ -68,7 +68,6 @@
                                 <span @click="preByFileName(info.preRelationViewUrl)">别名</span>
                                 <span @click="routerToDocumentView(info.index)">文档</span>
                                 <span @click="routerToMappingView(info.index)">映射</span>
-                                <span @click="routerToView(info.index)">冻结/解冻</span>
                                 <template v-if="info.status=='open'">
                                 <span @click="Index_OpenCloseController_Close(info.index)">
                                     <span class="red">关闭</span></span>

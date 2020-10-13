@@ -25,6 +25,8 @@ export default {
     "Index_ShardController_Cat_Shards": BASE_URL + '/Index_ShardController/_cat/shards/', //Index_ShardController/_cat/shards/index_bulk?h=*&format=JSON
     "Index_SegmentController_Cat_Segments": BASE_URL + '/Index_SegmentController/_cat/segments/', //Index_SegmentController/cat/segments/test2?v=true&format=JSON
     "Index_SettingController_Settings": BASE_URL + '/Index_SettingController/', //Index_SettingController/test2/_settings
+    "Index_FreezeUnFreezeController_Freeze": BASE_URL + '/Index_FreezeUnFreezeController/', //Index_FreezeUnFreezeController/test2/_freeze
+    "Index_FreezeUnFreezeController_Unfreeze": BASE_URL + '/Index_FreezeUnFreezeController/', //Index_FreezeUnFreezeController/test2/_unfreeze
 
     /** Search */
     "Search_DSL_MatchAllController_Search": BASE_URL + '/Search_DSL_MatchAllController/',//Search_DSL_MatchAllController/tb_object_0088/_search
