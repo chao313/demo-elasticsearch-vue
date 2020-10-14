@@ -79,7 +79,7 @@
                                 <span @click="Index_FreshFlushController_Flush(info.index)">flush</span>
                                 <span @click="routerToShardView(info.index)">分片</span>
                                 <span @click="routerToSegmentView(info.index)">段</span>
-                                <span @click="copy(info.index)">恢复</span>
+                                <span @click="routerToRecoveryView(info.index)">恢复</span>
                                 <span @click="routerToSettingView(info.index)">设置</span>
                             </td>
                         </tr>
@@ -560,6 +560,12 @@
                 let queryStr = "";
                 queryStr = queryStr + "index=" + index + "";
                 window.open("#/IndexManager_Index_Setting" + "?" + queryStr, '_self');
+            }
+            ,
+            routerToRecoveryView(index) {
+                let queryStr = "";
+                queryStr = queryStr + "index=" + index + "";
+                window.open("#/IndexManager_Index_Recovery" + "?" + queryStr, '_self');
             }
             ,
             searchEvent() {

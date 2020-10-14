@@ -27,6 +27,7 @@ export default {
     "Index_SettingController_Settings": BASE_URL + '/Index_SettingController/', //Index_SettingController/test2/_settings
     "Index_FreezeUnFreezeController_Freeze": BASE_URL + '/Index_FreezeUnFreezeController/', //Index_FreezeUnFreezeController/test2/_freeze
     "Index_FreezeUnFreezeController_Unfreeze": BASE_URL + '/Index_FreezeUnFreezeController/', //Index_FreezeUnFreezeController/test2/_unfreeze
+    "Index_RecoveryController_Cat_Recovery": BASE_URL + '/Index_RecoveryController/_cat/recovery/', //Index_RecoveryController/_cat/recovery/index_bulk?v=true&format=JSON
 
     /** Search */
     "Search_DSL_MatchAllController_Search": BASE_URL + '/Search_DSL_MatchAllController/',//Search_DSL_MatchAllController/tb_object_0088/_search

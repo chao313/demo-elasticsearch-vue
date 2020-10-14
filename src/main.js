@@ -9,6 +9,11 @@ import router from './router'
 import store from './store'
 import './permission'
 
+/**
+ * 这里是导入的入口！！！
+ */
+import DateUtil from './utils/DateUtil.js'
+
 Vue.use(ElementUI);
 /**
  * 设置全局的http
@@ -17,13 +22,14 @@ Vue.use(ElementUI);
 Vue.prototype.$http = http;
 /*设置全局的api*/
 Vue.prototype.api = api;
+Vue.prototype.$DateUtil = DateUtil;
 
 
 Vue.config.productionTip = false
 new Vue({
-  el: '#app',
-  router,
-  store,
-  template: '<App/>',
-  components: {App}
+    el: '#app',
+    router,
+    store,
+    template: '<App/>',
+    components: {App}
 })

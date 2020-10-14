@@ -56,7 +56,9 @@
                             <td>{{Index_SettingController_Settings_Result[index].settings.index.number_of_shards}}</td>
                             <td>{{Index_SettingController_Settings_Result[index].settings.index.number_of_replicas}}
                             </td>
-                            <td>{{Index_SettingController_Settings_Result[index].settings.index.creation_date}}</td>
+                            <td>{{Index_SettingController_Settings_Result[index].settings.index.creation_date |
+                                dateString}}
+                            </td>
                             <td>{{Index_SettingController_Settings_Result[index].settings.index.frozen||'false'}}
                             </td>
                             <template v-if="Index_SettingController_Settings_Result[index].settings.index.search">
@@ -93,6 +95,8 @@
 </template>
 
 <script>
+    import DateUtil from '../../utils/DateUtil.js'
+
     export default {
         data() {
             return {
@@ -148,7 +152,15 @@
                     authorizedOperations: []
                 }
             }
-        },
+        }
+        ,
+        filters: {
+            dateString(timestamp) {
+                const formatTime = DateUtil.dateFormat("YYYY-MM-dd HH:mm:ss", new Date(parseInt(timestamp)));
+                return formatTime;
+            }
+        }
+        ,
         mounted() {
             let self = this;
         },
@@ -371,8 +383,7 @@
                     )
 
                 })
-            }
-            ,
+            },
             routerToConfigsView(bootstrap_servers) {
                 //跳转携带参数
                 let queryStr = "";
