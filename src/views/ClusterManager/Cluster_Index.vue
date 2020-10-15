@@ -51,7 +51,7 @@
                     </tr>
                     <tbody>
                     <template v-if="Cluster_IndexController_Cat_Indices_Result">
-                        <tr v-for="(info,index) in Cluster_IndexController_Cat_Indices_Result">
+                        <tr v-for="(info,index) in Cluster_IndexController_Cat_Indices_Result.list">
                             <td>{{index+1}}</td>
                             <td>{{info.index}}</td>
                             <td>{{info.health}}</td>
@@ -87,6 +87,17 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt10">
+                <!--/** */:page-size  数一页的数量！！！-->
+                <el-pagination v-show="Cluster_IndexController_Cat_Indices_Result.list.length > 0"
+                               background
+                               @current-change="handleCurrentChange"
+                               :current-page.sync="Cluster_IndexController_Cat_Indices_Result.pageNum"
+                               :page-size="Cluster_IndexController_Cat_Indices_Result.pageSize"
+                               layout="total, prev, pager, next, jumper"
+                               :total="Cluster_IndexController_Cat_Indices_Result.total">
+                </el-pagination>
+            </div>
         </div>
 
     </div>
@@ -98,20 +109,45 @@
     export default {
         data() {
             return {
-                Cluster_IndexController_Cat_Indices_Result: [
-                    {
-                        "pri.store.size": "",
-                        "docs.deleted": "",
-                        "pri": "",
-                        "health": "",
-                        "index": "",
-                        "rep": "",
-                        "uuid": "",
-                        "store.size": "",
-                        "status": "",
-                        "docs.count": ""
-                    }
-                ],
+                Cluster_IndexController_Cat_Indices_Result: {
+                    "endRow": 10,
+                    "firstPage": 1,
+                    "hasNextPage": true,
+                    "hasPreviousPage": false,
+                    "isFirstPage": true,
+                    "isLastPage": false,
+                    "lastPage": 8,
+                    "list": [
+                        {
+                            "pri.store.size": "",
+                            "docs.deleted": "",
+                            "pri": "",
+                            "health": "",
+                            "index": "",
+                            "rep": "",
+                            "uuid": "",
+                            "store.size": "",
+                            "status": "",
+                            "docs.count": ""
+                        }
+                    ],
+                    "navigatePages": 8,
+                    "navigatepageNums": [1, 2, 3, 4, 5, 6, 7, 8],
+                    "nextPage": 2,
+                    "orderBy": "18ff48aa-258e-40ef-b555-0843dfad462c",
+                    "pageNum": 1,
+                    "pageSize": 10,
+                    "pages": 10,
+                    "prePage": 0,
+                    "size": 10,
+                    "startRow": 1,
+                    "total": 18100
+                },
+                headers: {//存放分页信息
+                    // "ES_HOST": "http://39.107.236.187:7014",
+                    "ES_PAGE": "true",
+                    "ES_PAGE_SIZE": "2000"
+                },
                 bootstrap: {
                     servers: '192.168.0.105:9092'
                 },
@@ -165,6 +201,11 @@
                 self.$http.get(self.api.Cluster_IndexController_Cat_Indices, {
                     params: {
                         'format': 'JSON'
+                    },
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST,
+                        "ES_PAGE": self.headers.ES_PAGE,
+                        "ES_PAGE_SIZE": self.headers.ES_PAGE_SIZE
                     }
                 }, function (response) {
                     if (response.code == 0) {
@@ -318,6 +359,41 @@
                         });
                     })
                 });
+            },
+            handleCurrentChange(currentChange) {
+                let self = this;
+                // self.topicPartitionAndRealOffset = [];
+                self.$http.get(self.api.RedisController_GetRecordByScrollId, {
+                    params: {
+                        'scrollId': self.Cluster_IndexController_Cat_Indices_Result.orderBy,
+                        'pageNum': currentChange,
+                        'pageSize': self.Cluster_IndexController_Cat_Indices_Result.pageSize,
+                    }
+                }, function (response) {
+
+                    if (response.code == 0) {
+                        self.consumers = [];
+                        self.Cluster_IndexController_Cat_Indices_Result = response.content;
+                        self.$message({
+                            type: 'success',
+                            message: '查询成功',
+                            duration: 1000
+                        });
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                })
             },
             //获取具体的配置
             queryBase() {

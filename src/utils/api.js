@@ -32,6 +32,10 @@ export default {
     /** Search */
     "Search_DSL_MatchAllController_Search": BASE_URL + '/Search_DSL_MatchAllController/',//Search_DSL_MatchAllController/tb_object_0088/_search
 
+    /**
+     * redis
+     */
+    "RedisController_GetRecordByScrollId": BASE_URL + '/RedisController/getRecordByScrollId',//RedisController/getRecordByScrollId
     /** 资源管理 */
 
     "addResourceFile": BASE_URL + '/ResourceController/addFile',
