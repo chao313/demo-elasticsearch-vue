@@ -41,8 +41,14 @@
                             <tr>
                                 <td>{{field}}</td>
                                 <td>{{info.type}}</td>
-                                <td>{{info.fields.keyword.type}}</td>
-                                <td>{{info.fields.keyword.ignore_above}}</td>
+                                <template v-if="info.fields">
+                                    <td>{{info.fields.keyword.type|"-"}}</td>
+                                    <td>{{info.fields.keyword.ignore_above|"-"}}</td>
+                                </template>
+                                <template v-else>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </template>
                             </tr>
                         </template>
                     </template>
@@ -62,12 +68,12 @@
             return {
                 index: '样例数据',
                 Index_MappingController_Mapping_Compatible_Result: {//不同版本之间的格式相对有差别
-                    "F24_0088": {
-                        "type": "text",
+                    "-": {//F24_0088
+                        "type": "-",//text
                         "fields": {
                             "keyword": {
-                                "ignore_above": 256,
-                                "type": "keyword"
+                                "ignore_above": 0,//256
+                                "type": ""//keyword
                             }
                         }
                     }

@@ -9,6 +9,9 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="indexContain">
+                    <el-input v-model="headers.ES_FILTER.index" placeholder="请输入indexContain"></el-input>
+                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
                 </el-form-item>
@@ -87,19 +90,18 @@
                     </tbody>
                 </table>
             </div>
-            <div class="mt10">
-                <!--/** */:page-size  数一页的数量！！！-->
-                <el-pagination v-show="Cluster_IndexController_Cat_Indices_Result.list.length > 0"
-                               background
-                               @current-change="handleCurrentChange"
-                               :current-page.sync="Cluster_IndexController_Cat_Indices_Result.pageNum"
-                               :page-size="Cluster_IndexController_Cat_Indices_Result.pageSize"
-                               layout="total, prev, pager, next, jumper"
-                               :total="Cluster_IndexController_Cat_Indices_Result.total">
-                </el-pagination>
-            </div>
         </div>
-
+        <div class="mt10">
+            <!--/** */:page-size  数一页的数量！！！-->
+            <el-pagination v-show="Cluster_IndexController_Cat_Indices_Result.list.length > 0"
+                           background
+                           @current-change="handleCurrentChange"
+                           :current-page.sync="Cluster_IndexController_Cat_Indices_Result.pageNum"
+                           :page-size="Cluster_IndexController_Cat_Indices_Result.pageSize"
+                           layout="total, prev, pager, next, jumper"
+                           :total="Cluster_IndexController_Cat_Indices_Result.total">
+            </el-pagination>
+        </div>
     </div>
 
 </template>
@@ -146,7 +148,10 @@
                 headers: {//存放分页信息
                     // "ES_HOST": "http://39.107.236.187:7014",
                     "ES_PAGE": "true",
-                    "ES_PAGE_SIZE": "2000"
+                    "ES_PAGE_SIZE": "15",
+                    "ES_FILTER": {
+                        "index": "*"
+                    }
                 },
                 bootstrap: {
                     servers: '192.168.0.105:9092'
@@ -205,7 +210,8 @@
                     headers: {
                         "ES_HOST": self.headers.ES_HOST,
                         "ES_PAGE": self.headers.ES_PAGE,
-                        "ES_PAGE_SIZE": self.headers.ES_PAGE_SIZE
+                        "ES_PAGE_SIZE": self.headers.ES_PAGE_SIZE,
+                        "ES_FILTER": JSON.stringify(self.headers.ES_FILTER)
                     }
                 }, function (response) {
                     if (response.code == 0) {
@@ -645,7 +651,7 @@
             }
             ,
             searchEvent() {
-                this.queryBase();
+                this.Cluster_IndexController_Cat_Indices();
             }
             ,
             searchRest() {

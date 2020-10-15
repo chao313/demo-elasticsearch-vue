@@ -47,7 +47,17 @@
                 </table>
             </div>
         </div>
-
+        <div class="mt10">
+            <!--/** */:page-size  数一页的数量！！！-->
+            <el-pagination v-show="Search_DSL_MatchAllController_Search_Result.hits.total.value > 0"
+                           background
+                           @current-change="handleCurrentChange"
+                           :current-page.sync="request.from/request.size+1"
+                           :page-size="request.size"
+                           layout="total, prev, pager, next, jumper"
+                           :total="Search_DSL_MatchAllController_Search_Result.hits.total.value">
+            </el-pagination>
+        </div>
     </div>
 
 </template>
@@ -111,7 +121,7 @@
                             "boost": 1
                         }
                     },
-                    "size": 10
+                    "size": 15
                 }
                 ,
                 bootstrap_servers: {
@@ -188,6 +198,11 @@
                     });
                 })
 
+            },
+            handleCurrentChange(currentChange) {
+                let self = this;
+                self.request.from = (currentChange - 1) * self.request.size;
+                self.Search_DSL_MatchAllController_Search();
             }
             ,
             routerToConfigsView(bootstrap_servers) {
