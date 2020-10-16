@@ -11,6 +11,7 @@ export default {
     "Cluster_LicenseController_License": BASE_URL + '/Cluster_LicenseController/_license',
     "Cluster_NodeController_Cat_Nodes": BASE_URL + '/Cluster_NodeController/_cat/nodes',
     "Cluster_SegmentController_Cat_Segments": BASE_URL + '/Cluster_SegmentController/_cat/segments',
+    "Cluster_PluginController_Cat_Plugins": BASE_URL + '/Cluster_PluginController/_cat/plugins',
 
     "Cluster_ShardController_Cat_Shards": BASE_URL + '/Cluster_ShardController/_cat/shards',
 
@@ -28,14 +29,18 @@ export default {
     "Index_FreezeUnFreezeController_Freeze": BASE_URL + '/Index_FreezeUnFreezeController/', //Index_FreezeUnFreezeController/test2/_freeze
     "Index_FreezeUnFreezeController_Unfreeze": BASE_URL + '/Index_FreezeUnFreezeController/', //Index_FreezeUnFreezeController/test2/_unfreeze
     "Index_RecoveryController_Cat_Recovery": BASE_URL + '/Index_RecoveryController/_cat/recovery/', //Index_RecoveryController/_cat/recovery/index_bulk?v=true&format=JSON
+    "Index_DocumentController_Delete": BASE_URL + '/Index_DocumentController/', //Index_DocumentController/<index>/<type>/<id> 文档删除
+    "Index_DocumentController_GET": BASE_URL + '/Index_DocumentController/', //Index_DocumentController/<index>/<type>/<id> 文档获取
 
     /** Search */
     "Search_DSL_MatchAllController_Search": BASE_URL + '/Search_DSL_MatchAllController/',//Search_DSL_MatchAllController/tb_object_0088/_search
 
-    /**
-     * redis
-     */
+    /** redis **/
     "RedisController_GetRecordByScrollId": BASE_URL + '/RedisController/getRecordByScrollId',//RedisController/getRecordByScrollId
+
+    /** 获取服务地址 **/
+    "ConfigController_GetServers": BASE_URL + '/ConfigController/getServers',
+
     /** 资源管理 */
 
     "addResourceFile": BASE_URL + '/ResourceController/addFile',

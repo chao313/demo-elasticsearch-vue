@@ -3,11 +3,14 @@
         <div class="mt20">
             <el-form :inline="true" size="mini">
                 <el-form-item label="bootstrap.servers">
-                    <el-select v-model="bootstrap.servers" placeholder="请输入kafka地址:">
+                    <el-select v-model="headers.ES_HOST" placeholder="请输入ES地址:">
                         <el-option v-for="(item,index) in bootstrap_servers" :key="item" :label="index"
-                                   :value="item">
+                                   :value="item" disabled>
                         </el-option>
                     </el-select>
+                </el-form-item>
+                <el-form-item label="index">
+                    <el-input v-model="index" placeholder="index" disabled></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
@@ -52,7 +55,8 @@
                     <tbody>
                     <template v-if="Index_SettingController_Settings_Result">
                         <tr>
-                            <td>{{Index_SettingController_Settings_Result[index].settings.index.provided_name}}</td>
+                            <td>{{Index_SettingController_Settings_Result[index].settings.index.provided_name||index}}
+                            </td>
                             <td>{{Index_SettingController_Settings_Result[index].settings.index.number_of_shards}}</td>
                             <td>{{Index_SettingController_Settings_Result[index].settings.index.number_of_replicas}}
                             </td>
@@ -74,12 +78,12 @@
                             <td>
                                 <template
                                         v-if="Index_SettingController_Settings_Result[index].settings.index.frozen=='true'">
-                                <span @click="Index_FreezeUnFreezeController_Unfreeze(Index_SettingController_Settings_Result[index].settings.index.provided_name)">
+                                <span @click="Index_FreezeUnFreezeController_Unfreeze(Index_SettingController_Settings_Result[index].settings.index.provided_name||index)">
                                     <span class="red">解冻</span></span>
                                 </template>
                                 <template v-else>
                                     <span class="redSpan"
-                                          @click="Index_FreezeUnFreezeController_Freeze(Index_SettingController_Settings_Result[index].settings.index.provided_name)">冻结</span>
+                                          @click="Index_FreezeUnFreezeController_Freeze(Index_SettingController_Settings_Result[index].settings.index.provided_name||index)">冻结</span>
                                 </template>
                             </td>
 
@@ -131,6 +135,9 @@
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
                 },
+                headers: {//存放分页信息
+                    "ES_HOST": "http://39.107.236.187:7014"
+                },
                 topicSize: 0,
                 consumerSize: 0,
                 clusterInfo: {
@@ -168,6 +175,9 @@
             let self = this;
             const index = this.$route.query && this.$route.query.index;
             self.index = index;
+            const header_ES_HOST = this.$route.query && this.$route.query.header_ES_HOST;
+            self.headers.ES_HOST = JSON.parse(header_ES_HOST);
+            self.ConfigController_GetServers();
             self.Index_SettingController_Settings();
         },
         watch: {},
@@ -176,7 +186,11 @@
             //获取具体的配置
             Index_SettingController_Settings() {
                 let self = this;
-                self.$http.get(self.api.Index_SettingController_Settings + self.index + "/_settings", {}, function (response) {
+                self.$http.get(self.api.Index_SettingController_Settings + self.index + "/_settings", {
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST
+                    }
+                }, function (response) {
                     if (response.code == 0) {
                         self.Index_SettingController_Settings_Result = response.content;
                         self.$message({
@@ -209,7 +223,11 @@
                     center: true
                 }).then(() => {
                     let self = this;
-                    self.$http.post(self.api.Index_FreezeUnFreezeController_Freeze + "/" + index + "/_freeze", {}, {}, function (response) {
+                    self.$http.post(self.api.Index_FreezeUnFreezeController_Freeze + index + "/_freeze", {}, {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
                         if (response.code == 0) {
                             self.$message({
                                 type: 'success',
@@ -241,7 +259,11 @@
                     center: true
                 }).then(() => {
                     let self = this;
-                    self.$http.post(self.api.Index_FreezeUnFreezeController_Unfreeze + "/" + index + "/_unfreeze", {}, {}, function (response) {
+                    self.$http.post(self.api.Index_FreezeUnFreezeController_Unfreeze + "/" + index + "/_unfreeze", {}, {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
                         if (response.code == 0) {
                             self.$message({
                                 type: 'success',
@@ -383,6 +405,38 @@
                     )
 
                 })
+            },
+            ConfigController_GetServers() {
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
+                        if (response.code == 0) {
+                            self.bootstrap_servers = response.content;
+                            for (var key in self.bootstrap_servers) {
+                                //随机赋值
+                                // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
+                                self.bootstrap.servers = self.bootstrap_servers[key];
+                            }
+                            self.$message({
+                                type: 'success',
+                                message: '查询成功',
+                                duration: 2000
+                            });
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
             },
             routerToConfigsView(bootstrap_servers) {
                 //跳转携带参数

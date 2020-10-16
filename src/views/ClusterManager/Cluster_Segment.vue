@@ -3,7 +3,7 @@
         <div class="mt20">
             <el-form :inline="true" size="mini">
                 <el-form-item label="bootstrap.servers">
-                    <el-select v-model="bootstrap.servers" placeholder="请输入kafka地址:">
+                    <el-select v-model="headers.ES_HOST" placeholder="请输入ES地址:">
                         <el-option v-for="(item,index) in bootstrap_servers" :key="item" :label="index"
                                    :value="item">
                         </el-option>
@@ -23,7 +23,7 @@
         <div class="app-list">
             <div class="app-tab">
                 <hr>
-                <h5 class="form-tit">集群Segment信息</h5>
+                <h5 class="form-tit">Segment(集群-段)</h5>
                 <table>
                     <thead>
                     <tr>
@@ -138,7 +138,7 @@
                     "total": 18100
                 },
                 headers: {//存放分页信息
-                    // "ES_HOST": "http://39.107.236.187:7014",
+                    "ES_HOST": "http://39.107.236.187:7014",
                     "ES_PAGE": "true",
                     "ES_PAGE_SIZE": "15",
                     "ES_FILTER": {
@@ -179,15 +179,10 @@
         },
         created() {
             let self = this;
-            self.Cluster_SegmentController_Cat_Segments();
-
-            self.clusterInfo.controller = {};
-            self.clusterInfo.nodes = {};
-            self.clusterInfo.clusterId = '';
             self.bootstrap = {};
             self.bootstrap_servers = {};
-            self.getKafkaBootstrapServers();
-
+            self.ConfigController_GetServers();
+            self.Cluster_SegmentController_Cat_Segments();
 
         },
         watch: {},
@@ -448,7 +443,38 @@
                     });
                 })
             },
-
+            ConfigController_GetServers() {
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
+                        if (response.code == 0) {
+                            self.bootstrap_servers = response.content;
+                            for (var key in self.bootstrap_servers) {
+                                //随机赋值
+                                // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
+                                self.bootstrap.servers = self.bootstrap_servers[key];
+                            }
+                            self.$message({
+                                type: 'success',
+                                message: '查询成功',
+                                duration: 2000
+                            });
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            },
             routerToConfigsView(bootstrap_servers) {
                 //跳转携带参数
                 let queryStr = "";

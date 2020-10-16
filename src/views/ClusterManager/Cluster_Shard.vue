@@ -3,7 +3,7 @@
         <div class="mt20">
             <el-form :inline="true" size="mini">
                 <el-form-item label="bootstrap.servers">
-                    <el-select v-model="bootstrap.servers" placeholder="请输入kafka地址:">
+                    <el-select v-model="headers.ES_HOST" placeholder="请输入ES地址:">
                         <el-option v-for="(item,index) in bootstrap_servers" :key="item" :label="index"
                                    :value="item">
                         </el-option>
@@ -15,11 +15,11 @@
                 <el-form-item label="indexContain">
                     <el-input v-model="headers.ES_FILTER.index" placeholder="请输入indexContain"></el-input>
                 </el-form-item>
-                <el-form-item label="段的类型">
+                <el-form-item label="分片类型">
                     <el-input v-model="headers.ES_FILTER.prirep" placeholder="请输入段的类型"></el-input>
                 </el-form-item>
                 <el-form-item label="stateContain">
-                    <el-input v-model="headers.ES_FILTER.state" placeholder="请输入stateContain"></el-input>
+                    <el-input v-model="headers.ES_FILTER.state" placeholder="请输入stateContain(STARTED/UNASSIGNED)"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
@@ -191,7 +191,7 @@
                     "total": 18100
                 },
                 headers: {//存放分页信息
-                    // "ES_HOST": "http://39.107.236.187:7014",
+                    "ES_HOST": "http://39.107.236.187:7014",
                     "ES_PAGE": "true",
                     "ES_PAGE_SIZE": "15",
                     "ES_FILTER": {
@@ -234,15 +234,10 @@
         },
         created() {
             let self = this;
-            self.Cluster_ShardController_Cat_Shards();
-
-            self.clusterInfo.controller = {};
-            self.clusterInfo.nodes = {};
-            self.clusterInfo.clusterId = '';
             self.bootstrap = {};
             self.bootstrap_servers = {};
-            self.getKafkaBootstrapServers();
-
+            self.ConfigController_GetServers();
+            self.Cluster_ShardController_Cat_Shards();
 
         },
         watch: {},
@@ -504,6 +499,38 @@
                 })
             }
             ,
+            ConfigController_GetServers() {
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
+                        if (response.code == 0) {
+                            self.bootstrap_servers = response.content;
+                            for (var key in self.bootstrap_servers) {
+                                //随机赋值
+                                // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
+                                self.bootstrap.servers = self.bootstrap_servers[key];
+                            }
+                            self.$message({
+                                type: 'success',
+                                message: '查询成功',
+                                duration: 2000
+                            });
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            },
             routerToConfigsView(bootstrap_servers) {
                 //跳转携带参数
                 let queryStr = "";

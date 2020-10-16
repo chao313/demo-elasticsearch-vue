@@ -3,11 +3,14 @@
         <div class="mt20">
             <el-form :inline="true" size="mini">
                 <el-form-item label="bootstrap.servers">
-                    <el-select v-model="bootstrap.servers" placeholder="请输入kafka地址:">
+                    <el-select v-model="headers.ES_HOST" placeholder="请输入ES地址:">
                         <el-option v-for="(item,index) in bootstrap_servers" :key="item" :label="index"
-                                   :value="item">
+                                   :value="item" disabled>
                         </el-option>
                     </el-select>
+                </el-form-item>
+                <el-form-item label="index">
+                    <el-input v-model="index" placeholder="index" disabled></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
@@ -84,6 +87,9 @@
                 bootstrap: {
                     servers: '192.168.0.105:9092'
                 },
+                headers: {
+                    "ES_HOST": "http://39.107.236.187:7014"
+                }
             }
         },
         mounted() {
@@ -93,6 +99,9 @@
             let self = this;
             const index = this.$route.query && this.$route.query.index;
             self.index = index;
+            const header_ES_HOST = this.$route.query && this.$route.query.header_ES_HOST;
+            self.headers.ES_HOST = JSON.parse(header_ES_HOST);
+            self.ConfigController_GetServers();
             self.Index_MappingController_Mapping_Compatible();
 
         },
@@ -100,7 +109,11 @@
         methods: {//获取具体的配置
             Index_MappingController_Mapping_Compatible() {
                 let self = this;
-                self.$http.post(self.api.Index_MappingController_Mapping_Compatible + "/" + self.index + "/_mapping/compatible", {}, {}, function (response) {
+                self.$http.post(self.api.Index_MappingController_Mapping_Compatible + "/" + self.index + "/_mapping/compatible", {}, {
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST
+                    }
+                }, function (response) {
                     if (response.code == 0) {
                         self.Index_MappingController_Mapping_Compatible_Result = response.content;
                         self.$message({
@@ -126,6 +139,38 @@
 
             }
             ,
+            ConfigController_GetServers() {
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
+                        if (response.code == 0) {
+                            self.bootstrap_servers = response.content;
+                            for (var key in self.bootstrap_servers) {
+                                //随机赋值
+                                // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
+                                self.bootstrap.servers = self.bootstrap_servers[key];
+                            }
+                            self.$message({
+                                type: 'success',
+                                message: '查询成功',
+                                duration: 2000
+                            });
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            },
             routerToConfigsView(bootstrap_servers) {
                 //跳转携带参数
                 let queryStr = "";

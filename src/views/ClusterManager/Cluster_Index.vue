@@ -3,7 +3,7 @@
         <div class="mt20">
             <el-form :inline="true" size="mini">
                 <el-form-item label="bootstrap.servers">
-                    <el-select v-model="bootstrap.servers" placeholder="请输入kafka地址:">
+                    <el-select v-model="headers.ES_HOST" placeholder="请输入ES地址:">
                         <el-option v-for="(item,index) in bootstrap_servers" :key="item" :label="index"
                                    :value="item">
                         </el-option>
@@ -11,6 +11,13 @@
                 </el-form-item>
                 <el-form-item label="indexContain">
                     <el-input v-model="headers.ES_FILTER.index" placeholder="请输入indexContain"></el-input>
+                </el-form-item>
+                <el-form-item label="healthContain">
+                    <el-input v-model="headers.ES_FILTER.health"
+                              placeholder="请输入healthContain(green/yellow/red)"></el-input>
+                </el-form-item>
+                <el-form-item label="statusContain">
+                    <el-input v-model="headers.ES_FILTER.status" placeholder="请输入statusContain(open	)"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
@@ -20,7 +27,7 @@
         <div class="app-list">
             <div class="app-tab">
                 <hr>
-                <h5 class="form-tit">Nodes(kafka的所有broker节点)</h5>
+                <h5 class="form-tit">Index(集群-索引)</h5>
                 <table>
                     <thead>
                     <tr>
@@ -84,6 +91,7 @@
                                 <span @click="routerToSegmentView(info.index)">段</span>
                                 <span @click="routerToRecoveryView(info.index)">恢复</span>
                                 <span @click="routerToSettingView(info.index)">设置</span>
+                                <span @click="routerToDSLView(info.index)">DSL</span>
                             </td>
                         </tr>
                     </template>
@@ -146,11 +154,13 @@
                     "total": 18100
                 },
                 headers: {//存放分页信息
-                    // "ES_HOST": "http://39.107.236.187:7014",
+                    "ES_HOST": "http://39.107.236.187:7014",
                     "ES_PAGE": "true",
                     "ES_PAGE_SIZE": "15",
                     "ES_FILTER": {
-                        "index": "*"
+                        "index": "*",
+                        "health": "*",
+                        "status": "*"
                     }
                 },
                 bootstrap: {
@@ -158,26 +168,6 @@
                 },
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
-                },
-                topicSize: 0,
-                consumerSize: 0,
-                clusterInfo: {
-                    controller: {
-                        port: 9092,
-                        idString: "",
-                        host: "192.168.0.105",
-                        id: 0,
-                    },
-                    nodes: [
-                        {
-                            port: 9092,
-                            idString: "xx",
-                            host: "192.168.0.105",
-                            id: 0
-                        }
-                    ],
-                    clusterId: "1",
-                    authorizedOperations: []
                 }
             }
         },
@@ -186,14 +176,10 @@
         },
         created() {
             let self = this;
-            self.Cluster_IndexController_Cat_Indices();
-
-            self.clusterInfo.controller = {};
-            self.clusterInfo.nodes = {};
-            self.clusterInfo.clusterId = '';
             self.bootstrap = {};
             self.bootstrap_servers = {};
-            self.getKafkaBootstrapServers();
+            self.ConfigController_GetServers();
+            self.Cluster_IndexController_Cat_Indices();
 
 
         },
@@ -245,7 +231,11 @@
                     center: true
                 }).then(() => {
                     let self = this;
-                    self.$http.post(self.api.Index_OpenCloseController_Close + "/" + index + "/_close", {}, {}, function (response) {
+                    self.$http.post(self.api.Index_OpenCloseController_Close + "/" + index + "/_close", {}, {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
                         if (response.code == 0) {
                             self.$message({
                                 type: 'success',
@@ -277,7 +267,11 @@
                     center: true
                 }).then(() => {
                     let self = this;
-                    self.$http.post(self.api.Index_OpenCloseController_Open + "/" + index + "/_open", {}, {}, function (response) {
+                    self.$http.post(self.api.Index_OpenCloseController_Open + "/" + index + "/_open", {}, {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
                         if (response.code == 0) {
                             self.$message({
                                 type: 'success',
@@ -309,7 +303,11 @@
                     center: true
                 }).then(() => {
                     let self = this;
-                    self.$http.get(self.api.Index_FreshFlushController_Refresh + "/" + index + "/_refresh", {}, function (response) {
+                    self.$http.get(self.api.Index_FreshFlushController_Refresh + "/" + index + "/_refresh", {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
                         if (response.code == 0) {
                             self.$message({
                                 type: 'success',
@@ -341,7 +339,11 @@
                     center: true
                 }).then(() => {
                     let self = this;
-                    self.$http.get(self.api.Index_FreshFlushController_Flush + "/" + index + "/_flush", {}, function (response) {
+                    self.$http.get(self.api.Index_FreshFlushController_Flush + "/" + index + "/_flush", {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
                         if (response.code == 0) {
                             self.$message({
                                 type: 'success',
@@ -401,106 +403,9 @@
                     });
                 })
             },
-            //获取具体的配置
-            queryBase() {
+            ConfigController_GetServers() {
                 let self = this;
-                self.$http.get(self.api.getCluster, {
-                    params: {
-                        'bootstrap.servers': self.bootstrap.servers
-                    }
-                }, function (response) {
-
-                    if (response.code == 0) {
-                        self.clusterInfo = response.content;
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                })
-
-            },
-            getTopicSize() {
-                let self = this;
-                self.$http.get(self.api.getTopicSize, {
-                    params: {
-                        'bootstrap.servers': self.bootstrap.servers
-                    }
-                }, function (response) {
-
-                    if (response.code == 0) {
-                        self.topicSize = response.content;
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                })
-
-            },
-            getConsumerGroupSize() {
-                let self = this;
-                self.$http.get(self.api.getConsumerGroupSize, {
-                    params: {
-                        'bootstrap.servers': self.bootstrap.servers
-                    }
-                }, function (response) {
-
-                    if (response.code == 0) {
-                        self.consumerSize = response.content;
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                })
-
-            },
-            getKafkaBootstrapServers() {
-                let self = this;
-                self.$http.get(self.api.getKafkaBootstrapServers, {}, function (response) {
+                self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
                         if (response.code == 0) {
                             self.bootstrap_servers = response.content;
                             for (var key in self.bootstrap_servers) {
@@ -508,9 +413,6 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.searchEvent();
-                            self.getTopicSize();
-                            self.getConsumerGroupSize();
                             self.$message({
                                 type: 'success',
                                 message: '查询成功',
@@ -533,121 +435,66 @@
                     }
                 )
             },
-            deleteByPrimaryKey(id) {
-                let self = this;
-                this.$confirm('是否删除该条数据？', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    center: true
-                }).then(() => {
-                    self.$http.get(self.api.deleteTBlogByPrimaryKey
-                        , {
-                            params: {
-                                id: id
-                            }
-                        },
-                        function (response) {
-                            if (response.code == 0) {
-                                if (response.content == true) {
-                                    self.$message({
-                                        type: 'success',
-                                        message: '删除成功',
-                                        duration: 2000
-                                    });
-                                    self.queryBase();
-                                } else {
-                                    self.$message({
-                                        type: 'warning',
-                                        message: '删除失败',
-                                        duration: 2000
-                                    });
-
-                                }
-                            } else {
-                                self.$message({
-                                    type: 'error',
-                                    message: response.msg,
-                                    duration: 2000
-                                });
-                            }
-                        },
-                        function (response) {
-                            console.log(response);
-                            //失败回调
-                            self.$message({
-                                type: 'error',
-                                message: "请求异常",
-                                duration: 2000
-                            });
-                        }
-                    )
-
-                })
-            }
-            ,
-            routerToConfigsView(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/BrokerManagerConfigsView" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicManagerList(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicManagerList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicPartitionOffsetList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicPartitionOffsetList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToConsumerManagerList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/ConsumerManagerList" + "?" + queryStr, '_self');
-            },
             routerToDetailView(index) {
+                let self = this;
                 let queryStr = "";
-                queryStr = queryStr + "index=" + index + "";
+                const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
+                queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
                 window.open("#/IndexManager_Index" + "?" + queryStr, '_self');
             },
             routerToMappingView(index) {
+                let self = this;
                 let queryStr = "";
-                queryStr = queryStr + "index=" + index + "";
+                const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
+                queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
                 window.open("#/IndexManager_Index_Mapping" + "?" + queryStr, '_self');
             },
             routerToDocumentView(index) {
+                let self = this;
                 let queryStr = "";
-                queryStr = queryStr + "index=" + index + "";
+                const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
+                queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
                 window.open("#/IndexManager_Index_Document" + "?" + queryStr, '_self');
             }
             ,
             routerToShardView(index) {
+                let self = this;
                 let queryStr = "";
-                queryStr = queryStr + "index=" + index + "";
+                const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
+                queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
                 window.open("#/IndexManager_Index_Shard" + "?" + queryStr, '_self');
             }
             ,
             routerToSegmentView(index) {
+                let self = this;
                 let queryStr = "";
-                queryStr = queryStr + "index=" + index + "";
+                const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
+                queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
                 window.open("#/IndexManager_Index_Segment" + "?" + queryStr, '_self');
             }
             ,
             routerToSettingView(index) {
+                let self = this;
                 let queryStr = "";
-                queryStr = queryStr + "index=" + index + "";
+                const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
+                queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
                 window.open("#/IndexManager_Index_Setting" + "?" + queryStr, '_self');
             }
             ,
             routerToRecoveryView(index) {
+                let self = this;
                 let queryStr = "";
-                queryStr = queryStr + "index=" + index + "";
+                const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
+                queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
                 window.open("#/IndexManager_Index_Recovery" + "?" + queryStr, '_self');
+            }
+            ,
+            routerToDSLView(index) {
+                let self = this;
+                let queryStr = "";
+                const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
+                queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
+                window.open("#/SearchManager_Search_DSL_TermLevel" + "?" + queryStr, '_self');
             }
             ,
             searchEvent() {
