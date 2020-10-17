@@ -16,6 +16,14 @@
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
                 </el-form-item>
             </el-form>
+            <hr>
+            <el-checkbox :indeterminate="sources.isIndeterminate" v-model="sources.checkAll"
+                         @change="handleCheckAllChange">全选
+            </el-checkbox>
+            <div style="margin: 15px 0;"></div>
+            <el-checkbox-group v-model="sources.checkedFields" @change="handlecheckedFieldsChange">
+                <el-checkbox v-for="field in sources.fields" :label="field" :key="field">{{field}}</el-checkbox>
+            </el-checkbox-group>
         </div>
         <div class="app-list">
             <div class="app-tab">
@@ -24,11 +32,11 @@
                 <table>
                     <thead>
                     <tr>
-                        <template v-if="Index_MappingController_Mapping_Compatible_Result">
+                        <template v-if="sources.checkedFields">
                             <th>id</th>
-                            <th>_index</th>
-                            <th>_type</th>
-                            <template v-for="(info,field) in Index_MappingController_Mapping_Compatible_Result">
+                            <!--<th>_index</th>-->
+                            <!--<th>_type</th>-->
+                            <template v-for="field in sources.checkedFields">
                                 <th>{{field}}</th>
                             </template>
                             <th>操作</th>
@@ -42,9 +50,9 @@
                             <tr>
                                 <td>{{index+1}}</td>
                                 <template v-if="Index_MappingController_Mapping_Compatible_Result">
-                                    <td>{{info1._index}}</td>
-                                    <td>{{info1._type}}</td>
-                                    <template v-for="(info,field) in Index_MappingController_Mapping_Compatible_Result">
+                                    <!--<td>{{info1._index}}</td>-->
+                                    <!--<td>{{info1._type}}</td>-->
+                                    <template v-for="field in sources.checkedFields">
                                         <td>{{info1._source[field]}}</td>
                                     </template>
                                 </template>
@@ -147,6 +155,12 @@
                 },
                 headers: {
                     "ES_HOST": "http://39.107.236.187:7014"
+                },
+                sources: {
+                    checkAll: false,
+                    checkedFields: ['样例数据', '样例数据'],//存放筛选的字段
+                    fields: ['样例数据', '样例数据'],
+                    isIndeterminate: true
                 }
             }
         },
@@ -175,6 +189,14 @@
                 }, function (response) {
                     if (response.code == 0) {
                         self.Index_MappingController_Mapping_Compatible_Result = response.content;
+                        //提取全部的key
+                        const keys = [];
+                        for (var key in response.content) {
+                            keys.push(key);
+                        }
+                        self.sources.fields = keys;
+                        self.sources.checkedFields = keys;
+
                         self.$message({
                             type: 'success',
                             message: '查询成功',
@@ -199,6 +221,7 @@
             }
             , Search_DSL_MatchAllController_Search() {
                 let self = this;
+                //self.request._source = self.sources.checkedFields;//这个很重要 需要考虑是否启用
                 self.$http.post(self.api.Search_DSL_MatchAllController_Search + "/" + self.index + "/_search", self.request, {
                     headers: {
                         "ES_HOST": self.headers.ES_HOST
@@ -283,7 +306,7 @@
             }
             ,
             searchEvent() {
-                this.queryBase();
+                this.Search_DSL_MatchAllController_Search();
             }
             ,
             searchRest() {
@@ -343,13 +366,10 @@
                     if (response.code == 0) {
                         self.$message({
                             type: 'success',
-                            message: '删除成功',
+                            message: '查询成功',
                             duration: 2000
                         });
-                        // self.showValue("",response.content)
-                        // self.pen("xxxxxxxxx")
-                        // self.pen(JSON.stringify(response.content))
-                        self.pen(response.content)
+                        self.pen(JSON.stringify(response.content, null, 2))
                     } else {
                         self.$message({
                             type: 'error',
@@ -366,20 +386,19 @@
                     });
                 })
             },
-            showValue(key, value) {
-                this.$confirm(value, key, {
-                    confirmButtonText: '确定',
-                    showCancelButton: false,
-                    center: true
-                }).then(() => {
-
-
-                })
-            },
             pen(value) {
-                this.$alert('<pre>' + JSON.parse(value) + '</pre>', 'HTML 片段', {
+                this.$alert('<pre>' + value + '</pre>', '预览', {
                     dangerouslyUseHTMLString: true
                 });
+            },
+            handleCheckAllChange(val) {
+                this.sources.checkedFields = val ? this.sources.fields : [];
+                this.sources.isIndeterminate = false;
+            },
+            handlecheckedFieldsChange(value) {
+                let checkedCount = value.length;
+                this.sources.checkAll = checkedCount === this.sources.fields.length;
+                this.sources.isIndeterminate = checkedCount > 0 && checkedCount < this.sources.fields.length;
             }
 
         }
