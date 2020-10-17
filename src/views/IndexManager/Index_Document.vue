@@ -17,13 +17,17 @@
                 </el-form-item>
             </el-form>
             <hr>
-            <el-checkbox :indeterminate="sources.isIndeterminate" v-model="sources.checkAll"
-                         @change="handleCheckAllChange">全选
-            </el-checkbox>
+            <el-collapse>
+                <el-collapse-item title="字段选择(默认展示全部)" name="1">
+                    <el-checkbox :indeterminate="sources.isIndeterminate" v-model="sources.checkAll"
+                                 @change="handleCheckAllChange">全选
+                    </el-checkbox>
+                    <el-checkbox-group v-model="sources.checkedFields" @change="handlecheckedFieldsChange">
+                        <el-checkbox v-for="field in sources.fields" :label="field" :key="field">{{field}}</el-checkbox>
+                    </el-checkbox-group>
+                </el-collapse-item>
+            </el-collapse>
             <div style="margin: 15px 0;"></div>
-            <el-checkbox-group v-model="sources.checkedFields" @change="handlecheckedFieldsChange">
-                <el-checkbox v-for="field in sources.fields" :label="field" :key="field">{{field}}</el-checkbox>
-            </el-checkbox-group>
         </div>
         <div class="app-list">
             <div class="app-tab">
@@ -37,7 +41,7 @@
                             <!--<th>_index</th>-->
                             <!--<th>_type</th>-->
                             <template v-for="field in sources.checkedFields">
-                                <th>{{field}}</th>
+                                <th class="td-format">{{field}}</th>
                             </template>
                             <th>操作</th>
                         </template>
@@ -53,10 +57,10 @@
                                     <!--<td>{{info1._index}}</td>-->
                                     <!--<td>{{info1._type}}</td>-->
                                     <template v-for="field in sources.checkedFields">
-                                        <td>{{info1._source[field]}}</td>
+                                        <td class="in-line td-format">{{info1._source[field]}}</td>
                                     </template>
                                 </template>
-                                <td>
+                                <td class="in-line">
                                     <span @click="Index_DocumentController_Get(info1._index,info1._type,info1._id)">查看</span>
                                     <span @click="routerToDSLView(info.index)">修改</span>
                                     <span class="red"
@@ -429,5 +433,16 @@
     .red {
         color: #b21f2d !important;
         /*font-size: 100px;*/
+    }
+
+    .in-line {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .td-format {
+        text-align: left !important;
+        padding-left: 16px;
     }
 </style>
