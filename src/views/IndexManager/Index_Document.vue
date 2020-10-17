@@ -12,6 +12,13 @@
                 <el-form-item label="index">
                     <el-input v-model="index" placeholder="index" disabled></el-input>
                 </el-form-item>
+                <el-form-item label="选择size">
+                    <el-select v-model="request.size">
+                        <el-option v-for=" item in level" :key="item" :label="item"
+                                   :value="item">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
                 </el-form-item>
@@ -165,7 +172,8 @@
                     checkedFields: ['样例数据', '样例数据'],//存放筛选的字段
                     fields: ['样例数据', '样例数据'],
                     isIndeterminate: true
-                }
+                },
+                level: ['15', '50', '100', '500', '1000', '2000'],
             }
         },
         mounted() {
