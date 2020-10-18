@@ -69,7 +69,7 @@
                                 </template>
                                 <td class="in-line">
                                     <span @click="Index_DocumentController_Get(info1._index,info1._type,info1._id)">查看</span>
-                                    <span @click="routerToDSLView(info.index)">修改</span>
+                                    <span @click="edit(info1._index,info1._type,info1._id,info1._source)">修改</span>
                                     <span class="red"
                                           @click="Index_DocumentController_Delete(info1._index,info1._type,info1._id)">删除</span>
                                 </td>
@@ -91,6 +91,20 @@
                            :total="Search_DSL_MatchAllController_Search_Result.compatible_total">
             </el-pagination>
         </div>
+        <el-dialog
+                title="更新"
+                :visible.sync="dialog.dialogVisible"
+                width="40%">
+            <el-input
+                    type="textarea"
+                    :rows="20"
+                    placeholder="请输入json"
+                    v-model="dialog.value">
+            </el-input>
+            <span slot="footer" class="dialog-footer">
+    <el-button @click="dialog.dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="handleClose">确 定</el-button></span>
+        </el-dialog>
     </div>
 
 </template>
@@ -174,6 +188,13 @@
                     isIndeterminate: true
                 },
                 level: ['15', '50', '100', '500', '1000', '2000'],
+                dialog: {
+                    dialogVisible: false,
+                    value: '',
+                    index: '',
+                    type: '',
+                    id: '',
+                }
             }
         },
         mounted() {
@@ -403,6 +424,51 @@
                     dangerouslyUseHTMLString: true
                 });
             },
+            edit(index, type, id, value) {
+                let self = this;
+                //清空
+                self.dialog.value = '';
+                self.dialog.index = '';
+                self.dialog.type = '';
+                self.dialog.id = '';
+                //
+                self.dialog.dialogVisible = true;
+                self.dialog.value = JSON.stringify(value, null, 2);
+                self.dialog.index = index;
+                self.dialog.type = type;
+                self.dialog.id = id;
+
+            },
+            Index_DocumentController_Update(index, type, id, value) {
+                let self = this;
+                self.$http.put(self.api.Index_DocumentController_Update + index + "/" + type + "/" + id, value, {
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST,
+                        'content-type': 'application/json'
+                    }
+                }, function (response) {
+                    if (response.code == 0) {
+                        self.$message({
+                            type: 'success',
+                            message: '更新成功',
+                            duration: 2000
+                        });
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                })
+            },
             handleCheckAllChange(val) {
                 this.sources.checkedFields = val ? this.sources.fields : [];
                 this.sources.isIndeterminate = false;
@@ -411,6 +477,18 @@
                 let checkedCount = value.length;
                 this.sources.checkAll = checkedCount === this.sources.fields.length;
                 this.sources.isIndeterminate = checkedCount > 0 && checkedCount < this.sources.fields.length;
+            },
+            handleClose() {
+                let self = this;
+                //更新
+                this.$confirm('确认更新?')
+                    .then(_ => {
+                        self.Index_DocumentController_Update(self.dialog.index, self.dialog.type, self.dialog.id, self.dialog.value);
+                        self.dialog.dialogVisible = false
+                    })
+                    .catch(_ => {
+                        self.dialog.dialogVisible = false
+                    });
             }
 
         }
@@ -452,5 +530,10 @@
     .td-format {
         text-align: left !important;
         padding-left: 16px;
+    }
+
+    .t_area {
+        width: 300px;
+        overflow-y: visible
     }
 </style>

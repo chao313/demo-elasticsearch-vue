@@ -31,6 +31,7 @@ export default {
     "Index_RecoveryController_Cat_Recovery": BASE_URL + '/Index_RecoveryController/_cat/recovery/', //Index_RecoveryController/_cat/recovery/index_bulk?v=true&format=JSON
     "Index_DocumentController_Delete": BASE_URL + '/Index_DocumentController/', //Index_DocumentController/<index>/<type>/<id> 文档删除
     "Index_DocumentController_GET": BASE_URL + '/Index_DocumentController/', //Index_DocumentController/<index>/<type>/<id> 文档获取
+    "Index_DocumentController_Update": BASE_URL + '/Index_DocumentController/', //Index_DocumentController/<index>/<type>/<id> 文档获取
 
     /** Search */
     "Search_DSL_MatchAllController_Search": BASE_URL + '/Search_DSL_MatchAllController/',//Search_DSL_MatchAllController/tb_object_0088/_search
