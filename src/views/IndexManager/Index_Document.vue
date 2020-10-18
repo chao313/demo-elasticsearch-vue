@@ -19,6 +19,13 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="选择排序">
+                    <el-select v-model="request.sort">
+                        <el-option v-for=" item in sources.fields" :key="item" :label="item"
+                                   :value="item">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
                 </el-form-item>
@@ -169,9 +176,9 @@
                             "boost": 1
                         }
                     },
-                    "size": 15
-                }
-                ,
+                    "size": 15,
+                    sort:"_score"
+                },
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
                 },
@@ -255,7 +262,7 @@
             , Search_DSL_MatchAllController_Search() {
                 let self = this;
                 //self.request._source = self.sources.checkedFields;//这个很重要 需要考虑是否启用
-                self.$http.post(self.api.Search_DSL_MatchAllController_Search + "/" + self.index + "/_search", self.request, {
+                self.$http.post(self.api.Search + "/" + self.index + "/_search", self.request, {
                     headers: {
                         "ES_HOST": self.headers.ES_HOST
                     }
