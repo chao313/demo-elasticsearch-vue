@@ -44,22 +44,53 @@
             <div style="margin: 15px 0;"></div>
             <el-form :inline="true" size="mini" :label-position="left">
                 <el-collapse>
-                    <el-collapse-item title="字段值筛选(默认展示全部)" name="1">
-                        <template v-for="(item,index) in DSL.type">
-                            <el-form-item :label="item" :label-position="left">
-                            </el-form-item>
+                    <el-collapse-item title="字段值筛选filter" name="1">
+                        <!-- filter-->
+                        <el-form-item label="exists">
+                            <el-button type="primary" class="el-button-search" @click="DSLAddExists()">+</el-button>
+                        </el-form-item>
+                        <br>
+                        <template v-for="(existsObj,index) in DSL.data.filter.exists">
                             <el-form-item>
-                                <el-select placeholder="请选择字段:">
+                                <el-select v-model="DSL.data.filter.exists[index].field"
+                                           placeholder="请选择字段:">
                                     <el-option v-for="field in sources.fields" :key="field" :label="field"
                                                :value="field">
                                     </el-option>
                                 </el-select>
                             </el-form-item>
                             <el-form-item>
-                                <el-input v-model="index" placeholder="index"></el-input>
+                                <el-button type="primary" class="el-button-search" @click="DSLRemoveExists(index)">-
+                                </el-button>
                             </el-form-item>
                             <br>
                         </template>
+                        <br>
+                        <!--      ------------------------------------------------- -->
+                        <!-- filter-->
+                        <el-form-item label="term">
+                            <el-button type="primary" class="el-button-search" @click="DSLAddTerm()">+</el-button>
+                        </el-form-item>
+                        <br>
+                        <template v-for="(termObj,index) in DSL.data.filter.term">
+                            <el-form-item>
+                                <el-select v-model="DSL.data.filter.term[index].field"
+                                           placeholder="请选择字段:">
+                                    <el-option v-for="field in sources.fields" :key="field" :label="field"
+                                               :value="field">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-input v-model="DSL.data.filter.term[index].value" placeholder="vlaue"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" class="el-button-search" @click="DSLRemoveTerm(index)">-
+                                </el-button>
+                            </el-form-item>
+                            <br>
+                        </template>
+                        <br>
                     </el-collapse-item>
                 </el-collapse>
             </el-form>
@@ -228,6 +259,81 @@
                         'like': 'wildcard',
                         'id': 'ids',
                         '相似度': 'fuzzy'
+                    },
+                    example: {
+                        real: {
+                            exists: {
+                                "exists": {
+                                    "field": ""
+                                }
+                            },
+                            term: {
+                                "term": {
+                                    "": {
+                                        "boost": "1.0",
+                                        "value": ""
+                                    }
+                                }
+                            }
+                        },
+                        show: {
+                            exists: {field: ''},
+                            term: {field: '', value: ''},
+                            terms: {field: '', value: ''},
+                            regexp: {field: '', gte: '', lte: ''},
+                            range: {field: '', value: ''},
+                            prefix: {field: '', value: ''},
+                            wildcard: {field: '', value: ''},
+                            ids: {field: '', value: ''},
+                            fuzzy: {field: '', value: ''}
+                        }
+                    },
+                    data: {
+                        filter: {
+                            exists: [],
+                            term: [],
+                            terms: [],
+                            regexp: [],
+                            range: [],
+                            prefix: [],
+                            wildcard: [],
+                            ids: [],
+                            fuzzy: []
+                        },
+                        must: {
+                            exists: [],
+                            term: [],
+                            terms: [],
+                            regexp: [],
+                            range: [],
+                            prefix: [],
+                            wildcard: [],
+                            ids: [],
+                            fuzzy: []
+                        },
+                        must_not: {
+                            exists: [{}],
+                            term: [],
+                            terms: [],
+                            regexp: [],
+                            range: [],
+                            prefix: [],
+                            wildcard: [],
+                            ids: [],
+                            fuzzy: []
+                        },
+
+                        should: {
+                            exists: [{}],
+                            term: [],
+                            terms: [],
+                            regexp: [],
+                            range: [],
+                            prefix: [],
+                            wildcard: [],
+                            ids: [],
+                            fuzzy: []
+                        }
                     }
                 },
                 dialog: {
@@ -241,7 +347,8 @@
         },
         mounted() {
             let self = this;
-        },
+        }
+        ,
         created() {
             let self = this;
             const index = this.$route.query && this.$route.query.index;
@@ -252,8 +359,10 @@
             self.Index_MappingController_Mapping_Compatible();
             self.Search_DSL_MatchAllController_Search();//匹配全部
 
-        },
-        watch: {},
+        }
+        ,
+        watch: {}
+        ,
         methods: {//获取具体的配置
             Index_MappingController_Mapping_Compatible() {
                 let self = this;
@@ -294,7 +403,8 @@
                 })
 
             }
-            , Search_DSL_MatchAllController_Search() {
+            ,
+            Search_DSL_MatchAllController_Search() {
                 let self = this;
                 //self.request._source = self.sources.checkedFields;//这个很重要 需要考虑是否启用
                 self.$http.post(self.api.Search + "/" + self.index + "/_search", self.request, {
@@ -334,7 +444,8 @@
                     });
                 })
 
-            },
+            }
+            ,
             ConfigController_GetServers() {
                 let self = this;
                 self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
@@ -366,7 +477,8 @@
                         });
                     }
                 )
-            },
+            }
+            ,
             handleCurrentChange(currentChange) {
                 let self = this;
                 self.request.from = (currentChange - 1) * self.request.size;
@@ -394,7 +506,8 @@
                 self.search.lookSum = '';
                 self.search.content = '';
                 this.queryBase();
-            },
+            }
+            ,
             Index_DocumentController_Delete(index, type, id) {
                 this.$confirm('是否删除该条索引？', '提示', {
                     confirmButtonText: '确定',
@@ -430,7 +543,8 @@
                         });
                     })
                 });
-            },
+            }
+            ,
             Index_DocumentController_Get(index, type, id) {
                 let self = this;
                 self.$http.get(self.api.Index_DocumentController_GET + index + "/" + type + "/" + id, {
@@ -460,12 +574,14 @@
                         duration: 1000
                     });
                 })
-            },
+            }
+            ,
             pen(value) {
                 this.$alert('<pre>' + value + '</pre>', '预览', {
                     dangerouslyUseHTMLString: true
                 });
-            },
+            }
+            ,
             edit(index, type, id, value) {
                 let self = this;
                 //清空
@@ -480,7 +596,8 @@
                 self.dialog.type = type;
                 self.dialog.id = id;
 
-            },
+            }
+            ,
             Index_DocumentController_Update(index, type, id, value) {
                 let self = this;
                 self.$http.put(self.api.Index_DocumentController_Update + index + "/" + type + "/" + id, value, {
@@ -510,16 +627,19 @@
                         duration: 1000
                     });
                 })
-            },
+            }
+            ,
             handleCheckAllChange(val) {
                 this.sources.checkedFields = val ? this.sources.fields : [];
                 this.sources.isIndeterminate = false;
-            },
+            }
+            ,
             handlecheckedFieldsChange(value) {
                 let checkedCount = value.length;
                 this.sources.checkAll = checkedCount === this.sources.fields.length;
                 this.sources.isIndeterminate = checkedCount > 0 && checkedCount < this.sources.fields.length;
-            },
+            }
+            ,
             handleClose() {
                 let self = this;
                 //更新
@@ -531,6 +651,28 @@
                     .catch(_ => {
                         self.dialog.dialogVisible = false
                     });
+            },
+            DSLAddExists() {
+                //添加 Exists
+                let self = this;
+                const example = JSON.parse(JSON.stringify(self.DSL.example.show.exists))
+                self.DSL.data.filter.exists.push(example);
+            },
+            DSLRemoveExists(index) {
+                //移除 Exists
+                let self = this;
+                self.DSL.data.filter.exists.splice(index, 1)
+            },
+            DSLAddTerm() {
+                //添加 Term
+                let self = this;
+                const example = JSON.parse(JSON.stringify(self.DSL.example.show.term))
+                self.DSL.data.filter.term.push(example);
+            },
+            DSLRemoveTerm(index) {
+                //移除 Term
+                let self = this;
+                self.DSL.data.filter.term.splice(index, 1)
             }
 
         }
