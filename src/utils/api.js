@@ -42,6 +42,8 @@ export default {
 
     /** 获取服务地址 **/
     "ConfigController_GetServers": BASE_URL + '/ConfigController/getServers',
+    /** helper服务地址 **/
+    "HelperController_DSLHelper": BASE_URL + '/HelperController/DSLHelper',
 
     /** 资源管理 */
 

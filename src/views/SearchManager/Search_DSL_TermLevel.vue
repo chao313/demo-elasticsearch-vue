@@ -46,8 +46,11 @@
                 <el-collapse>
                     <el-collapse-item title="字段值筛选filter" name="1">
                         <!-- filter-->
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="DSLAdd('filter','exists')">+
+                            </el-button>
+                        </el-form-item>
                         <el-form-item label="exists">
-                            <el-button type="primary" class="el-button-search" @click="DSLAddExists()">+</el-button>
                         </el-form-item>
                         <br>
                         <template v-for="(existsObj,index) in DSL.data.filter.exists">
@@ -60,19 +63,23 @@
                                 </el-select>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" class="el-button-search" @click="DSLRemoveExists(index)">-
+                                <el-button type="primary" class="el-button-search"
+                                           @click="DSLRemove('filter','exists',index)">-
                                 </el-button>
                             </el-form-item>
                             <br>
                         </template>
                         <br>
                         <!--      ------------------------------------------------- -->
-                        <!-- filter-->
+                        <!-- term -->
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="DSLAdd('filter','term')">+
+                            </el-button>
+                        </el-form-item>
                         <el-form-item label="term">
-                            <el-button type="primary" class="el-button-search" @click="DSLAddTerm()">+</el-button>
                         </el-form-item>
                         <br>
-                        <template v-for="(termObj,index) in DSL.data.filter.term">
+                        <template v-for="(obj,index) in DSL.data.filter.term">
                             <el-form-item>
                                 <el-select v-model="DSL.data.filter.term[index].field"
                                            placeholder="请选择字段:">
@@ -85,7 +92,222 @@
                                 <el-input v-model="DSL.data.filter.term[index].value" placeholder="vlaue"></el-input>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" class="el-button-search" @click="DSLRemoveTerm(index)">-
+                                <el-button type="primary" class="el-button-search"
+                                           @click="DSLRemove('filter','term',index,)">-
+                                </el-button>
+                            </el-form-item>
+                            <br>
+                        </template>
+                        <br>
+                        <!--      ------------------------------------------------- -->
+                        <!-- terms -->
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="DSLAdd('filter','terms')">+
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item label="terms">
+                        </el-form-item>
+                        <br>
+                        <template v-for="(obj,index) in DSL.data.filter.terms">
+                            <el-form-item>
+                                <el-select v-model="DSL.data.filter.terms[index].field"
+                                           placeholder="请选择字段:">
+                                    <el-option v-for="field in sources.fields" :key="field" :label="field"
+                                               :value="field">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+
+                            <template v-for="(obj,valueIndex) in DSL.data.filter.terms[index].value">
+                                <el-form-item>
+                                    <el-input v-model="DSL.data.filter.terms[index].value[valueIndex]"
+                                              placeholder="vlaue"></el-input>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" class="el-button-search"
+                                               @click="DSLTermsValueAdd('filter',index,valueIndex)">+
+                                    </el-button>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" class="el-button-search"
+                                               @click="DSLTermsValueRemove('filter',index,valueIndex)">-
+                                    </el-button>
+                                </el-form-item>
+                            </template>
+                            <el-form-item>
+                                <el-button type="primary" class="el-button-search"
+                                           @click="DSLRemove('filter','terms',index)">-
+                                </el-button>
+                            </el-form-item>
+                            <br>
+                        </template>
+                        <br>
+                        <!--      ------------------------------------------------- -->
+                        <!-- range -->
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="DSLAdd('filter','range')">+
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item label="range">
+                        </el-form-item>
+                        <br>
+                        <template v-for="(obj,index) in DSL.data.filter.range">
+                            <el-form-item>
+                                <el-select v-model="DSL.data.filter.range[index].field"
+                                           placeholder="请选择字段:">
+                                    <el-option v-for="field in sources.fields" :key="field" :label="field"
+                                               :value="field">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-input v-model="DSL.data.filter.range[index].gte" placeholder="大于"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-input v-model="DSL.data.filter.range[index].lte" placeholder="小于"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" class="el-button-search"
+                                           @click="DSLRemove('filter','range',index)">-
+                                </el-button>
+                            </el-form-item>
+                            <br>
+                        </template>
+                        <br>
+                        <!--      ------------------------------------------------- -->
+                        <!-- regexp -->
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="DSLAdd('filter','regexp')">+
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item label="regexp">
+                        </el-form-item>
+                        <br>
+                        <template v-for="(obj,index) in DSL.data.filter.regexp">
+                            <el-form-item>
+                                <el-select v-model="DSL.data.filter.regexp[index].field"
+                                           placeholder="请选择字段:">
+                                    <el-option v-for="field in sources.fields" :key="field" :label="field"
+                                               :value="field">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-input v-model="DSL.data.filter.regexp[index].value" placeholder="vlaue"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" class="el-button-search"
+                                           @click="DSLRemove('filter','regexp',index)">-
+                                </el-button>
+                            </el-form-item>
+                            <br>
+                        </template>
+                        <br>
+                        <!--      ------------------------------------------------- -->
+                        <!-- prefix -->
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="DSLAdd('filter','prefix')">+
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item label="prefix">
+                        </el-form-item>
+                        <br>
+                        <template v-for="(obj,index) in DSL.data.filter.prefix">
+                            <el-form-item>
+                                <el-select v-model="DSL.data.filter.prefix[index].field"
+                                           placeholder="请选择字段:">
+                                    <el-option v-for="field in sources.fields" :key="field" :label="field"
+                                               :value="field">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-input v-model="DSL.data.filter.prefix[index].value" placeholder="vlaue"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" class="el-button-search"
+                                           @click="DSLRemove('filter','prefix',index)">-
+                                </el-button>
+                            </el-form-item>
+                            <br>
+                        </template>
+                        <br>
+                        <!--      ------------------------------------------------- -->
+                        <!-- wildcard -->
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="DSLAdd('filter','wildcard')">+
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item label="wildcard">
+                        </el-form-item>
+                        <br>
+                        <template v-for="(obj,index) in DSL.data.filter.wildcard">
+                            <el-form-item>
+                                <el-select v-model="DSL.data.filter.wildcard[index].field"
+                                           placeholder="请选择字段:">
+                                    <el-option v-for="field in sources.fields" :key="field" :label="field"
+                                               :value="field">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-input v-model="DSL.data.filter.wildcard[index].value"
+                                          placeholder="vlaue"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" class="el-button-search"
+                                           @click="DSLRemove('filter',index,'wildcard')">
+                                    -
+                                </el-button>
+                            </el-form-item>
+                            <br>
+                        </template>
+                        <br>
+                        <!--      ------------------------------------------------- -->
+                        <!-- ids -->
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="DSLAdd('filter','ids')">+
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item label="ids">
+                        </el-form-item>
+                        <br>
+                        <template v-for="(obj,index) in DSL.data.filter.ids.value">
+                            <el-form-item>
+                                <el-input v-model="DSL.data.filter.ids.value[index]" placeholder="vlaue"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" class="el-button-search"
+                                           @click="DSLRemove('filter','ids',index)">-
+                                </el-button>
+                            </el-form-item>
+                            <br>
+                        </template>
+                        <br>
+                        <!--      ------------------------------------------------- -->
+                        <!-- fuzzy -->
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="DSLAdd('filter','fuzzy')">+
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item label="fuzzy">
+                        </el-form-item>
+                        <br>
+                        <template v-for="(obj,index) in DSL.data.filter.fuzzy">
+                            <el-form-item>
+                                <el-select v-model="DSL.data.filter.fuzzy[index].field"
+                                           placeholder="请选择字段:">
+                                    <el-option v-for="field in sources.fields" :key="field" :label="field"
+                                               :value="field">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-input v-model="DSL.data.filter.fuzzy[index].value" placeholder="vlaue"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" class="el-button-search"
+                                           @click="DSLRemove('filter','fuzzy',index)">-
                                 </el-button>
                             </el-form-item>
                             <br>
@@ -116,8 +338,8 @@
                     </thead>
                     <tbody>
 
-                    <template v-if="Search_DSL_MatchAllController_Search_Result">
-                        <template v-for="(info1,index) in Search_DSL_MatchAllController_Search_Result.hits.hits">
+                    <template v-if="Search_Result">
+                        <template v-for="(info1,index) in Search_Result.hits.hits">
                             <tr>
                                 <td>{{index+1}}</td>
                                 <template v-if="Index_MappingController_Mapping_Compatible_Result">
@@ -142,13 +364,13 @@
         </div>
         <div class="mt10">
             <!--/** */:page-size  数一页的数量！！！-->
-            <el-pagination v-show="Search_DSL_MatchAllController_Search_Result.compatible_total > 0"
+            <el-pagination v-show="Search_Result.compatible_total > 0"
                            background
                            @current-change="handleCurrentChange"
                            :current-page.sync="request.from/request.size+1"
                            :page-size="request.size"
                            layout="total, prev, pager, next, jumper"
-                           :total="Search_DSL_MatchAllController_Search_Result.compatible_total">
+                           :total="Search_Result.compatible_total">
             </el-pagination>
         </div>
         <el-dialog
@@ -186,7 +408,7 @@
                         }
                     }
                 },
-                Search_DSL_MatchAllController_Search_Result: {
+                Search_Result: {
                     "_shards": {
                         "total": 1,
                         "failed": 0,
@@ -279,12 +501,12 @@
                         show: {
                             exists: {field: ''},
                             term: {field: '', value: ''},
-                            terms: {field: '', value: ''},
-                            regexp: {field: '', gte: '', lte: ''},
-                            range: {field: '', value: ''},
+                            terms: {field: '', value: ['']},
+                            range: {field: '', gte: '', lte: ''},
+                            regexp: {field: '', value: ''},
                             prefix: {field: '', value: ''},
                             wildcard: {field: '', value: ''},
-                            ids: {field: '', value: ''},
+                            ids: {value: ['']},
                             fuzzy: {field: '', value: ''}
                         }
                     },
@@ -293,45 +515,45 @@
                             exists: [],
                             term: [],
                             terms: [],
-                            regexp: [],
                             range: [],
+                            regexp: [],
                             prefix: [],
                             wildcard: [],
-                            ids: [],
+                            ids: {},
                             fuzzy: []
                         },
                         must: {
                             exists: [],
                             term: [],
                             terms: [],
-                            regexp: [],
                             range: [],
+                            regexp: [],
                             prefix: [],
                             wildcard: [],
-                            ids: [],
+                            ids: {},
                             fuzzy: []
                         },
                         must_not: {
-                            exists: [{}],
+                            exists: [],
                             term: [],
                             terms: [],
-                            regexp: [],
                             range: [],
+                            regexp: [],
                             prefix: [],
                             wildcard: [],
-                            ids: [],
+                            ids: {},
                             fuzzy: []
                         },
 
                         should: {
-                            exists: [{}],
+                            exists: [],
                             term: [],
                             terms: [],
-                            regexp: [],
                             range: [],
+                            regexp: [],
                             prefix: [],
                             wildcard: [],
-                            ids: [],
+                            ids: {},
                             fuzzy: []
                         }
                     }
@@ -357,7 +579,7 @@
             self.headers.ES_HOST = JSON.parse(header_ES_HOST);
             self.ConfigController_GetServers();
             self.Index_MappingController_Mapping_Compatible();
-            self.Search_DSL_MatchAllController_Search();//匹配全部
+            self.Search();
 
         }
         ,
@@ -404,7 +626,7 @@
 
             }
             ,
-            Search_DSL_MatchAllController_Search() {
+            Search() {
                 let self = this;
                 //self.request._source = self.sources.checkedFields;//这个很重要 需要考虑是否启用
                 self.$http.post(self.api.Search + "/" + self.index + "/_search", self.request, {
@@ -413,15 +635,15 @@
                     }
                 }, function (response) {
                     if (response.code == 0) {
-                        self.Search_DSL_MatchAllController_Search_Result = response.content;
+                        self.Search_Result = response.content;
                         /**
                          * 兼容ES版本问题 存放total的位置变化
                          */
-                        console.info("total:" + self.Search_DSL_MatchAllController_Search_Result.hits.total)
-                        if (null != self.Search_DSL_MatchAllController_Search_Result.hits.total.value) {
-                            self.Search_DSL_MatchAllController_Search_Result.compatible_total = self.Search_DSL_MatchAllController_Search_Result.hits.total.value;
-                        } else if (null != self.Search_DSL_MatchAllController_Search_Result.hits.total) {
-                            self.Search_DSL_MatchAllController_Search_Result.compatible_total = self.Search_DSL_MatchAllController_Search_Result.hits.total;
+                        console.info("total:" + self.Search_Result.hits.total)
+                        if (null != self.Search_Result.hits.total.value) {
+                            self.Search_Result.compatible_total = self.Search_Result.hits.total.value;
+                        } else if (null != self.Search_Result.hits.total) {
+                            self.Search_Result.compatible_total = self.Search_Result.hits.total;
                         }
                         self.$message({
                             type: 'success',
@@ -482,7 +704,7 @@
             handleCurrentChange(currentChange) {
                 let self = this;
                 self.request.from = (currentChange - 1) * self.request.size;
-                self.Search_DSL_MatchAllController_Search();
+                self.Search();
             }
             ,
 
@@ -493,7 +715,29 @@
             }
             ,
             searchEvent() {
-                this.Search_DSL_MatchAllController_Search();
+                //DSLParse
+                let self = this;
+                self.$http.post(self.api.HelperController_DSLHelper, self.DSL.data, {}, function (response) {
+                    if (response.code == 0) {
+                        self.request.query = response.content;
+                        self.Search();
+
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                });
+                this.Search();
             }
             ,
             searchRest() {
@@ -526,7 +770,7 @@
                                 message: '删除成功',
                                 duration: 2000
                             });
-                            self.Search_DSL_MatchAllController_Search();//刷新 这里的删除有延迟，立刻刷新会有检索延迟问题
+                            self.Search();//刷新 这里的删除有延迟，立刻刷新会有检索延迟问题
                         } else {
                             self.$message({
                                 type: 'error',
@@ -651,30 +895,43 @@
                     .catch(_ => {
                         self.dialog.dialogVisible = false
                     });
-            },
-            DSLAddExists() {
-                //添加 Exists
-                let self = this;
-                const example = JSON.parse(JSON.stringify(self.DSL.example.show.exists))
-                self.DSL.data.filter.exists.push(example);
-            },
-            DSLRemoveExists(index) {
-                //移除 Exists
-                let self = this;
-                self.DSL.data.filter.exists.splice(index, 1)
-            },
-            DSLAddTerm() {
-                //添加 Term
-                let self = this;
-                const example = JSON.parse(JSON.stringify(self.DSL.example.show.term))
-                self.DSL.data.filter.term.push(example);
-            },
-            DSLRemoveTerm(index) {
-                //移除 Term
-                let self = this;
-                self.DSL.data.filter.term.splice(index, 1)
             }
-
+            ,
+            DSLAdd(bool, type) {
+                //DSL 统一添加
+                let self = this;
+                const example = JSON.parse(JSON.stringify(self.DSL.example.show[type]))
+                if (type != 'ids') {
+                    self.DSL.data[bool][type].push(example);
+                } else {
+                    if (JSON.stringify(self.DSL.data[bool][type]) == '{}') {
+                        self.DSL.data[bool][type] = example;
+                    } else {
+                        self.DSL.data[bool][type].value.push('');
+                    }
+                }
+            }
+            ,
+            DSLRemove(bool, type, index) {
+                //DSL统一移除
+                let self = this;
+                if (type != 'ids') {
+                    self.DSL.data[bool][type].splice(index, 1);
+                } else {
+                    self.DSL.data[bool][type].value.splice(index, 1);
+                }
+            },
+            DSLTermsValueAdd(bool, index, valueIndex) {
+                //专门添加Terms
+                let self = this;
+                console.info("index:" + index)
+                self.DSL.data[bool]['terms'][index].value.push('');
+            },
+            DSLTermsValueRemove(bool, index, valueIndex) {
+                //专门移除Terms
+                let self = this;
+                self.DSL.data[bool]['terms'][index].value.splice(valueIndex, 1);
+            }
         }
 
     }

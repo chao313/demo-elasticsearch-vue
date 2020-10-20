@@ -154,7 +154,7 @@
                     "total": 18100
                 },
                 headers: {//存放分页信息
-                    "ES_HOST": "http://39.107.236.187:7014",
+                    "ES_HOST": "http://10.202.16.9:9200",
                     "ES_PAGE": "true",
                     "ES_PAGE_SIZE": "15",
                     "ES_FILTER": {
