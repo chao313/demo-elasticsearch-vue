@@ -74,7 +74,6 @@
                                 </el-form-item>
                                 <br>
                             </template>
-                            <br>
                             <!--      ------------------------------------------------- -->
                             <!-- term -->
                             <el-form-item>
@@ -104,7 +103,6 @@
                                 </el-form-item>
                                 <br>
                             </template>
-                            <br>
                             <!--      ------------------------------------------------- -->
                             <!-- terms -->
                             <el-form-item>
@@ -147,7 +145,6 @@
                                 </el-form-item>
                                 <br>
                             </template>
-                            <br>
                             <!--      ------------------------------------------------- -->
                             <!-- range -->
                             <el-form-item>
@@ -179,7 +176,6 @@
                                 </el-form-item>
                                 <br>
                             </template>
-                            <br>
                             <!--      ------------------------------------------------- -->
                             <!-- regexp -->
                             <el-form-item>
@@ -209,7 +205,6 @@
                                 </el-form-item>
                                 <br>
                             </template>
-                            <br>
                             <!--      ------------------------------------------------- -->
                             <!-- prefix -->
                             <el-form-item>
@@ -239,7 +234,6 @@
                                 </el-form-item>
                                 <br>
                             </template>
-                            <br>
                             <!--      ------------------------------------------------- -->
                             <!-- wildcard -->
                             <el-form-item>
@@ -271,7 +265,6 @@
                                 </el-form-item>
                                 <br>
                             </template>
-                            <br>
                             <!--      ------------------------------------------------- -->
                             <!-- ids -->
                             <el-form-item>
@@ -293,7 +286,6 @@
                                 </el-form-item>
                                 <br>
                             </template>
-                            <br>
                             <!--      ------------------------------------------------- -->
                             <!-- fuzzy -->
                             <el-form-item>
@@ -323,7 +315,6 @@
                                 </el-form-item>
                                 <br>
                             </template>
-                            <br>
                         </el-collapse-item>
                     </el-collapse>
                 </el-form>
