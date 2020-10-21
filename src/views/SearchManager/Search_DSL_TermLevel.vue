@@ -29,6 +29,10 @@
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
                 </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" class="el-button-search" @click="outputToExcelEvent()">导出为Excel
+                    </el-button>
+                </el-form-item>
             </el-form>
             <hr>
             <el-collapse>
@@ -395,11 +399,24 @@
     <el-button @click="dialog.dialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="handleClose">确 定</el-button></span>
         </el-dialog>
+        <!--下载地址-->
+        <el-dialog
+                title="下载Url"
+                :visible.sync="Excel.dialog.dialogVisible"
+                width="40%">
+            <template v-for="url in Excel.dialog.urls">
+                <a :href="url" target="_blank">{{url}}</a>
+            </template>
+            <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="Excel.dialog.dialogVisible = false">确 定</el-button></span>
+        </el-dialog>
     </div>
 
 </template>
 
 <script>
+
+    import {Loading} from "element-ui";
 
     export default {
         data() {
@@ -573,6 +590,12 @@
                     index: '',
                     type: '',
                     id: '',
+                },
+                Excel: {
+                    dialog: {
+                        dialogVisible: false,
+                        urls: []
+                    }
                 }
             }
         },
@@ -748,6 +771,64 @@
                 });
             }
             ,
+            outputToExcelEvent() {
+                //导出为excel
+                let self = this;
+                self.$http.post(self.api.HelperController_DSLHelper, self.DSL.data, {}, function (response) {
+                    if (response.code == 0) {
+                        self.request.query = response.content;
+                        self.outputToExcel();
+
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                });
+            }
+            ,
+            outputToExcel() {
+                //导出为excel
+                let self = this;
+                var loadingInstance = Loading.service();
+                self.$http.post(self.api.HelperController_OutputToExcel + self.index, self.request, {
+                    params: {
+                        'scroll': '1m'
+                    },
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST
+                    }
+                }, function (response) {
+                    if (response.code == 0) {
+                        self.Excel.dialog.urls = response.content;
+                        self.Excel.dialog.dialogVisible = true;
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                });
+                Loading.close();
+            }
+            ,
             searchRest() {
                 let self = this;
                 self.search.id = '';
@@ -829,6 +910,12 @@
             }
             ,
             pen(value) {
+                this.$alert('<pre>' + value + '</pre>', '预览', {
+                    dangerouslyUseHTMLString: true
+                });
+            }
+            ,
+            penExcelUrl(values) {
                 this.$alert('<pre>' + value + '</pre>', '预览', {
                     dangerouslyUseHTMLString: true
                 });

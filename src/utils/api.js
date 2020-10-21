@@ -44,6 +44,7 @@ export default {
     "ConfigController_GetServers": BASE_URL + '/ConfigController/getServers',
     /** helper服务地址 **/
     "HelperController_DSLHelper": BASE_URL + '/HelperController/DSLHelper',
+    "HelperController_OutputToExcel": BASE_URL + '/HelperController/_search/outputToExcel/',//_search/outputToExcel/{index} 导出为excel
 
     /** 资源管理 */
 
