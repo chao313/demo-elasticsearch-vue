@@ -45,6 +45,7 @@ export default {
     /** helper服务地址 **/
     "HelperController_DSLHelper": BASE_URL + '/HelperController/DSLHelper',
     "HelperController_OutputToExcel": BASE_URL + '/HelperController/_search/outputToExcel/',//_search/outputToExcel/{index} 导出为excel
+    "HelperController_OutputToDb": BASE_URL + '/HelperController/_search/outputToDB/',//_search/outputToDB/{index} 导出为db数据
 
     /** 资源管理 */
 

@@ -29,8 +29,19 @@
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
                 </el-form-item>
+                <el-form-item label="选择导出size" size="mini">
+                    <el-select v-model="outPut.size" filterable @blur="selectBlur">
+                        <el-option v-for=" item in outPut.level" :key="item" :label="item"
+                                   :value="item">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" class="el-button-search" @click="outputToExcelEvent()">导出为Excel
+                    <el-button type="primary" class="el-button-search" @click="outputToEvent('excel')">导出为Excel
+                    </el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">导出为Excel
                     </el-button>
                 </el-form-item>
             </el-form>
@@ -486,6 +497,11 @@
                     isIndeterminate: true
                 },
                 level: ['15', '50', '100', '500', '1000', '2000'],
+                outPut: {
+                    level: ['500', '5000', '10000', '50000', '100000', '200000', '500000', '1000000', '-1'],
+                    size: '10000'
+                },
+
                 DSL: {
                     bool: ['filter', 'must_not', 'should', 'must'],
                     type: {
@@ -762,13 +778,19 @@
                 });
             }
             ,
-            outputToExcelEvent() {
+            outputToEvent(type) {
                 //导出为excel
                 let self = this;
                 self.$http.post(self.api.HelperController_DSLHelper, self.DSL.data, {}, function (response) {
                     if (response.code == 0) {
                         self.request.query = response.content;
-                        self.outputToExcel();
+                        if ('excel' == type) {
+                            //导出为excel
+                            self.outputToExcel();
+                        } else if ('db' == type) {
+                            //导出为db
+                            self.outputToDb();
+                        }
 
                     } else {
                         self.$message({
@@ -790,10 +812,51 @@
             outputToExcel() {
                 //导出为excel
                 let self = this;
+                //这里重写导出的size
+                const request = JSON.parse(JSON.stringify(self.request));
+                request.size = 1000;
                 var loadingInstance = Loading.service();
-                self.$http.post(self.api.HelperController_OutputToExcel + self.index, self.request, {
+                self.$http.post(self.api.HelperController_OutputToExcel + self.index, request, {
                     params: {
-                        'scroll': '1m'
+                        'scroll': '1m',
+                        'outPutSize': self.outPut.size
+                    },
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST
+                    }
+                }, function (response) {
+                    if (response.code == 0) {
+                        self.Excel.dialog.urls = response.content;
+                        self.Excel.dialog.dialogVisible = true;
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                });
+                Loading.close();
+            }
+            ,
+            outputToDb() {
+                //导出为excel
+                let self = this;
+                //这里重写导出的size
+                const request = JSON.parse(JSON.stringify(self.request));
+                request.size = 1000;
+                var loadingInstance = Loading.service();
+                self.$http.post(self.api.HelperController_OutputToDb + self.index, request, {
+                    params: {
+                        'scroll': '1m',
+                        'outPutSize': self.outPut.size
                     },
                     headers: {
                         "ES_HOST": self.headers.ES_HOST
@@ -1017,6 +1080,9 @@
                 //专门移除Terms
                 let self = this;
                 self.DSL.data[bool]['terms'][index].value.splice(valueIndex, 1);
+            },
+            selectBlur(e) {
+                this.value = e.target.value
             }
         }
 
