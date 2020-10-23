@@ -435,7 +435,8 @@
         <el-dialog
                 title="更新"
                 :visible.sync="dialog.dialogVisible"
-                width="40%">
+                width="40%"
+                :before-close="handleClose">
             <el-input
                     type="textarea"
                     :rows="20"
@@ -444,14 +445,16 @@
             </el-input>
             <span slot="footer" class="dialog-footer">
     <el-button @click="dialog.dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="handleClose">确 定</el-button></span>
+    <el-button type="primary" @click="handleUpdate">确 定</el-button></span>
         </el-dialog>
         <!--下载地址-->
         <el-dialog
                 title="下载Url"
                 :visible.sync="Excel.dialog.dialogVisible"
-                width="40%">
+                width="40%"
+                :before-close="handleClose">
             <template v-for="url in Excel.dialog.urls">
+                <br>
                 <a :href="url" target="_blank">{{url}}</a>
             </template>
             <span slot="footer" class="dialog-footer">
@@ -543,7 +546,7 @@
                 },
                 level: ['15', '50', '100', '500', '1000', '2000'],
                 outPut: {
-                    level: ['500', '5000', '10000', '50000', '100000', '200000', '500000', '1000000', '-1'],
+                    level: ['10', '500', '5000', '10000', '50000', '100000', '200000', '500000', '1000000', '-1'],
                     size: '10000'
                 },
 
@@ -1081,7 +1084,7 @@
                 this.sources.isIndeterminate = checkedCount > 0 && checkedCount < this.sources.fields.length;
             }
             ,
-            handleClose() {
+            handleUpdate() {
                 let self = this;
                 //更新
                 this.$confirm('确认更新?')
@@ -1091,6 +1094,17 @@
                     })
                     .catch(_ => {
                         self.dialog.dialogVisible = false
+                    });
+            },
+            handleClose() {
+                let self = this;
+                //更新
+                this.$confirm('确认关闭?')
+                    .then(_ => {
+                        self.Excel.dialog.dialogVisible = false;
+                    })
+                    .catch(_ => {
+                        self.Excel.dialog.dialogVisible = true;
                     });
             }
             ,
@@ -1180,6 +1194,7 @@
 
     .el-row {
         margin-bottom: 20px;
+
         &:last-child {
             margin-bottom: 0;
         }
