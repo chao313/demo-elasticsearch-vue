@@ -58,7 +58,7 @@
             </el-collapse>
             <div style="margin: 15px 0;"></div>
             <el-row :gutter="20">
-                <el-col :span="12">
+                <el-col :span="11">
                     <div class="grid-content">
                         <template v-for="(boolType,index) in DSL.bool">
                             <el-form :inline="true" size="mini" :label-position="left">
@@ -355,24 +355,26 @@
                         </template>
                     </div>
                 </el-col>
-                <el-col :span="12">
+                <el-col :span="1">
                     <el-form size="mini">
-                        <el-form-item label="SQL">
-                            <el-form-item>
-                                <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">解析
-                                </el-button>
-                            </el-form-item>
-                            <div class="grid-content">
-                                <el-input
-                                        type="textarea"
-                                        :autosize="{ minRows: 8, maxRows: 8}"
-                                        placeholder="请输入内容"
-                                        v-model="sql.content">
-                                </el-input>
-                            </div>
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="ESToSQL()">解析=>
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search" @click="SQLToEs()"><=解析
+                            </el-button>
                         </el-form-item>
                     </el-form>
-
+                </el-col>
+                <el-col :span="11">
+                    <el-form size="mini">
+                        <div class="grid-content">
+                            <!-- sql 提示-->
+                            <textarea rows="6" ref="mycode" v-model="sql.content" placeholder="按Ctrl键进行代码提示"
+                                      class="codesql" style="height:200px;width:600px;"/>
+                        </div>
+                    </el-form>
                 </el-col>
             </el-row>
             <div style="margin: 15px 0;"></div>
@@ -467,6 +469,19 @@
 <script>
 
     import {Loading} from "element-ui";
+
+    //sql 提示
+    import 'codemirror/theme/ambiance.css'
+    import 'codemirror/lib/codemirror.css'
+    import 'codemirror/addon/hint/show-hint.css'
+
+    let CodeMirror = require('codemirror/lib/codemirror')
+    require('codemirror/addon/edit/matchbrackets')
+    require('codemirror/addon/selection/active-line')
+    require('codemirror/mode/sql/sql')
+    require('codemirror/addon/hint/show-hint')
+    require('codemirror/addon/hint/sql-hint')
+    //sql 提示
 
     export default {
         data() {
@@ -653,12 +668,15 @@
                     }
                 },
                 sql: {
-                    content: ''
+                    content: '',
+                    hintOptions: {tables: {}},
+                    editor: null
                 }
             }
         },
         mounted() {
             let self = this;
+            self.sqlInit();
         }
         ,
         created() {
@@ -670,6 +688,8 @@
             self.ConfigController_GetServers();
             self.Index_MappingController_Mapping_Compatible();
             self.Search();
+            //设置sql
+
 
         }
         ,
@@ -721,7 +741,8 @@
                 //self.request._source = self.sources.checkedFields;//这个很重要 需要考虑是否启用
                 self.$http.post(self.api.Search + "/" + self.index + "/_search", self.request, {
                     headers: {
-                        "ES_HOST": self.headers.ES_HOST
+                        "ES_HOST": self.headers.ES_HOST,
+                        'content-type': 'application/json'
                     }
                 }, function (response) {
                     if (response.code == 0) {
@@ -1145,8 +1166,104 @@
             },
             selectBlur(e) {
                 this.value = e.target.value
+            },
+            sqlInit() {
+                let self = this;
+                self.sql.hintOptions['tables'][self.index] = self.sources.fields;
+                const data = JSON.parse(JSON.stringify(self.sql.hintOptions));
+                console.log(data);
+                //添加sql编辑
+                let mime = 'text/x-mariadb'
+                // let theme = 'ambiance'//设置主题，不设置的会使用默认主题
+                let editor = CodeMirror.fromTextArea(this.$refs.mycode, {
+                    mode: mime, // 选择对应代码编辑器的语言，我这边选的是数据库，根据个人情况自行设置即可
+                    indentWithTabs: true,
+                    smartIndent: true,
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    // theme: theme,
+                    // autofocus: true,
+                    // extraKeys: { Ctrl: 'autocomplete' }, // 自定义快捷键
+                    hintOptions: {
+                        // 自定义提示选项
+                        // tables: {
+                        //     users: ['1112', '123123', '124124'],
+                        //     countries: ['124', '124124', '1']
+                        // }
+
+                        data
+                    }
+                })
+                // 代码自动提示功能，记住使用cursorActivity事件不要使用change事件，这是一个坑，那样页面直接会卡死
+                editor.on('cursorActivity', function () {
+                    editor.showHint()
+                });
+                self.sql.editor = editor;
+            },
+
+            SQLToEs() {
+                //SQL 转换成 ES
+                let self = this;
+                // debugger
+                const sql = this.sql.editor.getValue();
+                // const sql = this.sql.content;
+                self.$http.post(self.api.HelperController_SQLHelper, sql, {
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST,
+                        'content-type': 'application/json'
+                    }
+                }, function (response) {
+                    if (response.code == 0) {
+                        // self.Excel.dialog.urls = response.content;
+                        // self.Excel.dialog.dialogVisible = true;
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                });
+                Loading.close();
+            },
+            ESToSQL() {
+                //ES 转换成 SQL
+                let self = this;
+                self.$http.post(self.api.HelperController_SQLHelper, self.sql.content, {
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST,
+                        'content-type': 'application/json'
+                    }
+                }, function (response) {
+                    if (response.code == 0) {
+                        // self.Excel.dialog.urls = response.content;
+                        // self.Excel.dialog.dialogVisible = true;
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                });
+                Loading.close();
             }
         }
+
 
     }
 </script>
@@ -1224,5 +1341,13 @@
     .row-bg {
         padding: 10px 0;
         background-color: #f9fafc;
+    }
+
+    .codesql {
+        font-size: 11pt;
+        font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono,
+        DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+        overflow-x: visible;
+        overflow-y: visible;
     }
 </style>
