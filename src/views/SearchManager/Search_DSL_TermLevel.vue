@@ -557,7 +557,7 @@
                     "_source": [
                         "*"
                     ],
-                    "from": 0,
+                    from: 0,
                     "query": {
                         "match_all": {
                             "boost": 1
@@ -860,7 +860,7 @@
                 self.$http.post(self.api.HelperController_DSLHelper, self.DSL.data, {}, function (response) {
                     if (response.code == 0) {
                         self.request.query = response.content;
-                        self.request.size = 0;//这个比较重要 经常在上面吃亏! 存储不清除
+                        self.request.from = 0;//这个比较重要 经常在上面吃亏! 存储不清除
                         self.Search();
 
                     } else {
