@@ -73,22 +73,24 @@
                                         <el-form-item label="exists">
                                         </el-form-item>
                                         <br>
-                                        <template v-for="(existsObj,index) in DSL.data[boolType].exists">
-                                            <el-form-item>
-                                                <el-select v-model="DSL.data[boolType].exists[index].field"
-                                                           placeholder="请选择字段:" filterable>
-                                                    <el-option v-for="field in sources.fields" :key="field"
-                                                               :label="field"
-                                                               :value="field">
-                                                    </el-option>
-                                                </el-select>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-button type="primary" class="el-button-search"
-                                                           @click="DSLRemove(boolType,'exists',index)">-
-                                                </el-button>
-                                            </el-form-item>
-                                            <br>
+                                        <template v-if="DSL.data[boolType].exists">
+                                            <template v-for="(existsObj,index) in DSL.data[boolType].exists">
+                                                <el-form-item>
+                                                    <el-select v-model="DSL.data[boolType].exists[index].field"
+                                                               placeholder="请选择字段:" filterable>
+                                                        <el-option v-for="field in sources.fields" :key="field"
+                                                                   :label="field"
+                                                                   :value="field">
+                                                        </el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-button type="primary" class="el-button-search"
+                                                               @click="DSLRemove(boolType,'exists',index)">-
+                                                    </el-button>
+                                                </el-form-item>
+                                                <br>
+                                            </template>
                                         </template>
                                         <!--      ------------------------------------------------- -->
                                         <!-- term -->
@@ -100,26 +102,28 @@
                                         <el-form-item label="term">
                                         </el-form-item>
                                         <br>
-                                        <template v-for="(obj,index) in DSL.data[boolType].term">
-                                            <el-form-item>
-                                                <el-select v-model="DSL.data[boolType].term[index].field"
-                                                           placeholder="请选择字段:" filterable>
-                                                    <el-option v-for="field in sources.fields" :key="field"
-                                                               :label="field"
-                                                               :value="field">
-                                                    </el-option>
-                                                </el-select>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-input v-model="DSL.data[boolType].term[index].value"
-                                                          placeholder="vlaue"></el-input>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-button type="primary" class="el-button-search"
-                                                           @click="DSLRemove(boolType,'term',index,)">-
-                                                </el-button>
-                                            </el-form-item>
-                                            <br>
+                                        <template v-if="DSL.data[boolType].term">
+                                            <template v-for="(obj,index) in DSL.data[boolType].term">
+                                                <el-form-item>
+                                                    <el-select v-model="DSL.data[boolType].term[index].field"
+                                                               placeholder="请选择字段:" filterable>
+                                                        <el-option v-for="field in sources.fields" :key="field"
+                                                                   :label="field"
+                                                                   :value="field">
+                                                        </el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-input v-model="DSL.data[boolType].term[index].value"
+                                                              placeholder="vlaue"></el-input>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-button type="primary" class="el-button-search"
+                                                               @click="DSLRemove(boolType,'term',index,)">-
+                                                    </el-button>
+                                                </el-form-item>
+                                                <br>
+                                            </template>
                                         </template>
                                         <!--      ------------------------------------------------- -->
                                         <!-- terms -->
@@ -141,30 +145,34 @@
                                                     </el-option>
                                                 </el-select>
                                             </el-form-item>
-
-                                            <template v-for="(obj,valueIndex) in DSL.data[boolType].terms[index].value">
-                                                <el-form-item>
-                                                    <el-input
-                                                            v-model="DSL.data[boolType].terms[index].value[valueIndex]"
-                                                            placeholder="vlaue"></el-input>
-                                                </el-form-item>
+                                            <template v-if="DSL.data[boolType].terms">
+                                                <template
+                                                        v-for="(obj,valueIndex) in DSL.data[boolType].terms[index].value">
+                                                    <el-form-item>
+                                                        <el-input
+                                                                v-model="DSL.data[boolType].terms[index].value[valueIndex]"
+                                                                placeholder="vlaue"></el-input>
+                                                    </el-form-item>
+                                                    <el-form-item>
+                                                        <el-button type="primary" class="el-button-search"
+                                                                   @click="DSLTermsValueAdd(boolType,index,valueIndex)">
+                                                            +
+                                                        </el-button>
+                                                    </el-form-item>
+                                                    <el-form-item>
+                                                        <el-button type="primary" class="el-button-search"
+                                                                   @click="DSLTermsValueRemove(boolType,index,valueIndex)">
+                                                            -
+                                                        </el-button>
+                                                    </el-form-item>
+                                                </template>
                                                 <el-form-item>
                                                     <el-button type="primary" class="el-button-search"
-                                                               @click="DSLTermsValueAdd(boolType,index,valueIndex)">+
+                                                               @click="DSLRemove(boolType,'terms',index)">-
                                                     </el-button>
                                                 </el-form-item>
-                                                <el-form-item>
-                                                    <el-button type="primary" class="el-button-search"
-                                                               @click="DSLTermsValueRemove(boolType,index,valueIndex)">-
-                                                    </el-button>
-                                                </el-form-item>
+                                                <br>
                                             </template>
-                                            <el-form-item>
-                                                <el-button type="primary" class="el-button-search"
-                                                           @click="DSLRemove(boolType,'terms',index)">-
-                                                </el-button>
-                                            </el-form-item>
-                                            <br>
                                         </template>
                                         <!--      ------------------------------------------------- -->
                                         <!-- range -->
@@ -176,30 +184,32 @@
                                         <el-form-item label="range">
                                         </el-form-item>
                                         <br>
-                                        <template v-for="(obj,index) in DSL.data[boolType].range">
-                                            <el-form-item>
-                                                <el-select v-model="DSL.data[boolType].range[index].field"
-                                                           placeholder="请选择字段:" filterable>
-                                                    <el-option v-for="field in sources.fields" :key="field"
-                                                               :label="field"
-                                                               :value="field">
-                                                    </el-option>
-                                                </el-select>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-input v-model="DSL.data[boolType].range[index].gte"
-                                                          placeholder="大于"></el-input>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-input v-model="DSL.data[boolType].range[index].lte"
-                                                          placeholder="小于"></el-input>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-button type="primary" class="el-button-search"
-                                                           @click="DSLRemove(boolType,'range',index)">-
-                                                </el-button>
-                                            </el-form-item>
-                                            <br>
+                                        <template v-if="DSL.data[boolType].range">
+                                            <template v-for="(obj,index) in DSL.data[boolType].range">
+                                                <el-form-item>
+                                                    <el-select v-model="DSL.data[boolType].range[index].field"
+                                                               placeholder="请选择字段:" filterable>
+                                                        <el-option v-for="field in sources.fields" :key="field"
+                                                                   :label="field"
+                                                                   :value="field">
+                                                        </el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-input v-model="DSL.data[boolType].range[index].gte"
+                                                              placeholder="大于"></el-input>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-input v-model="DSL.data[boolType].range[index].lte"
+                                                              placeholder="小于"></el-input>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-button type="primary" class="el-button-search"
+                                                               @click="DSLRemove(boolType,'range',index)">-
+                                                    </el-button>
+                                                </el-form-item>
+                                                <br>
+                                            </template>
                                         </template>
                                         <!--      ------------------------------------------------- -->
                                         <!-- regexp -->
@@ -211,26 +221,28 @@
                                         <el-form-item label="regexp">
                                         </el-form-item>
                                         <br>
-                                        <template v-for="(obj,index) in DSL.data[boolType].regexp">
-                                            <el-form-item>
-                                                <el-select v-model="DSL.data[boolType].regexp[index].field"
-                                                           placeholder="请选择字段:" filterable>
-                                                    <el-option v-for="field in sources.fields" :key="field"
-                                                               :label="field"
-                                                               :value="field">
-                                                    </el-option>
-                                                </el-select>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-input v-model="DSL.data[boolType].regexp[index].value"
-                                                          placeholder="vlaue"></el-input>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-button type="primary" class="el-button-search"
-                                                           @click="DSLRemove(boolType,'regexp',index)">-
-                                                </el-button>
-                                            </el-form-item>
-                                            <br>
+                                        <template v-if="DSL.data[boolType].regexp">
+                                            <template v-for="(obj,index) in DSL.data[boolType].regexp">
+                                                <el-form-item>
+                                                    <el-select v-model="DSL.data[boolType].regexp[index].field"
+                                                               placeholder="请选择字段:" filterable>
+                                                        <el-option v-for="field in sources.fields" :key="field"
+                                                                   :label="field"
+                                                                   :value="field">
+                                                        </el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-input v-model="DSL.data[boolType].regexp[index].value"
+                                                              placeholder="vlaue"></el-input>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-button type="primary" class="el-button-search"
+                                                               @click="DSLRemove(boolType,'regexp',index)">-
+                                                    </el-button>
+                                                </el-form-item>
+                                                <br>
+                                            </template>
                                         </template>
                                         <!--      ------------------------------------------------- -->
                                         <!-- prefix -->
@@ -242,26 +254,28 @@
                                         <el-form-item label="prefix">
                                         </el-form-item>
                                         <br>
-                                        <template v-for="(obj,index) in DSL.data[boolType].prefix">
-                                            <el-form-item>
-                                                <el-select v-model="DSL.data[boolType].prefix[index].field"
-                                                           placeholder="请选择字段:" filterable>
-                                                    <el-option v-for="field in sources.fields" :key="field"
-                                                               :label="field"
-                                                               :value="field">
-                                                    </el-option>
-                                                </el-select>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-input v-model="DSL.data[boolType].prefix[index].value"
-                                                          placeholder="vlaue"></el-input>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-button type="primary" class="el-button-search"
-                                                           @click="DSLRemove(boolType,'prefix',index)">-
-                                                </el-button>
-                                            </el-form-item>
-                                            <br>
+                                        <template v-if="DSL.data[boolType].prefix">
+                                            <template v-for="(obj,index) in DSL.data[boolType].prefix">
+                                                <el-form-item>
+                                                    <el-select v-model="DSL.data[boolType].prefix[index].field"
+                                                               placeholder="请选择字段:" filterable>
+                                                        <el-option v-for="field in sources.fields" :key="field"
+                                                                   :label="field"
+                                                                   :value="field">
+                                                        </el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-input v-model="DSL.data[boolType].prefix[index].value"
+                                                              placeholder="vlaue"></el-input>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-button type="primary" class="el-button-search"
+                                                               @click="DSLRemove(boolType,'prefix',index)">-
+                                                    </el-button>
+                                                </el-form-item>
+                                                <br>
+                                            </template>
                                         </template>
                                         <!--      ------------------------------------------------- -->
                                         <!-- wildcard -->
@@ -274,30 +288,33 @@
                                         <el-form-item label="wildcard">
                                         </el-form-item>
                                         <br>
-                                        <template v-for="(obj,index) in DSL.data[boolType].wildcard">
-                                            <el-form-item>
-                                                <el-select v-model="DSL.data[boolType].wildcard[index].field"
-                                                           placeholder="请选择字段:" filterable>
-                                                    <el-option v-for="field in sources.fields" :key="field"
-                                                               :label="field"
-                                                               :value="field">
-                                                    </el-option>
-                                                </el-select>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-input v-model="DSL.data[boolType].wildcard[index].value"
-                                                          placeholder="vlaue"></el-input>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-button type="primary" class="el-button-search"
-                                                           @click="DSLRemove(boolType,index,'wildcard')">
-                                                    -
-                                                </el-button>
-                                            </el-form-item>
-                                            <br>
+                                        <template v-if="DSL.data[boolType].wildcard">
+                                            <template v-for="(obj,index) in DSL.data[boolType].wildcard">
+                                                <el-form-item>
+                                                    <el-select v-model="DSL.data[boolType].wildcard[index].field"
+                                                               placeholder="请选择字段:" filterable>
+                                                        <el-option v-for="field in sources.fields" :key="field"
+                                                                   :label="field"
+                                                                   :value="field">
+                                                        </el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-input v-model="DSL.data[boolType].wildcard[index].value"
+                                                              placeholder="vlaue"></el-input>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-button type="primary" class="el-button-search"
+                                                               @click="DSLRemove(boolType,'wildcard',index)">
+                                                        -
+                                                    </el-button>
+                                                </el-form-item>
+                                                <br>
+                                            </template>
                                         </template>
                                         <!--      ------------------------------------------------- -->
                                         <!-- ids -->
+
                                         <el-form-item>
                                             <el-button type="primary" class="el-button-search"
                                                        @click="DSLAdd(boolType,'ids')">+
@@ -306,17 +323,19 @@
                                         <el-form-item label="ids">
                                         </el-form-item>
                                         <br>
-                                        <template v-for="(obj,index) in DSL.data[boolType].ids.value">
-                                            <el-form-item>
-                                                <el-input v-model="DSL.data[boolType].ids.value[index]"
-                                                          placeholder="vlaue"></el-input>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-button type="primary" class="el-button-search"
-                                                           @click="DSLRemove(boolType,'ids',index)">-
-                                                </el-button>
-                                            </el-form-item>
-                                            <br>
+                                        <template v-if="DSL.data[boolType].ids">
+                                            <template v-for="(obj,index) in DSL.data[boolType].ids.value">
+                                                <el-form-item>
+                                                    <el-input v-model="DSL.data[boolType].ids.value[index]"
+                                                              placeholder="vlaue"></el-input>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-button type="primary" class="el-button-search"
+                                                               @click="DSLRemove(boolType,'ids',index)">-
+                                                    </el-button>
+                                                </el-form-item>
+                                                <br>
+                                            </template>
                                         </template>
                                         <!--      ------------------------------------------------- -->
                                         <!-- fuzzy -->
@@ -328,26 +347,28 @@
                                         <el-form-item label="fuzzy">
                                         </el-form-item>
                                         <br>
-                                        <template v-for="(obj,index) in DSL.data[boolType].fuzzy">
-                                            <el-form-item>
-                                                <el-select v-model="DSL.data[boolType].fuzzy[index].field"
-                                                           placeholder="请选择字段:" filterable>
-                                                    <el-option v-for="field in sources.fields" :key="field"
-                                                               :label="field"
-                                                               :value="field">
-                                                    </el-option>
-                                                </el-select>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-input v-model="DSL.data[boolType].fuzzy[index].value"
-                                                          placeholder="vlaue"></el-input>
-                                            </el-form-item>
-                                            <el-form-item>
-                                                <el-button type="primary" class="el-button-search"
-                                                           @click="DSLRemove(boolType,'fuzzy',index)">-
-                                                </el-button>
-                                            </el-form-item>
-                                            <br>
+                                        <template v-if="DSL.data[boolType].fuzzy">
+                                            <template v-for="(obj,index) in DSL.data[boolType].fuzzy">
+                                                <el-form-item>
+                                                    <el-select v-model="DSL.data[boolType].fuzzy[index].field"
+                                                               placeholder="请选择字段:" filterable>
+                                                        <el-option v-for="field in sources.fields" :key="field"
+                                                                   :label="field"
+                                                                   :value="field">
+                                                        </el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-input v-model="DSL.data[boolType].fuzzy[index].value"
+                                                              placeholder="vlaue"></el-input>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                    <el-button type="primary" class="el-button-search"
+                                                               @click="DSLRemove(boolType,'fuzzy',index)">-
+                                                    </el-button>
+                                                </el-form-item>
+                                                <br>
+                                            </template>
                                         </template>
                                     </el-collapse-item>
                                 </el-collapse>
@@ -362,7 +383,8 @@
                             </el-button>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" class="el-button-search" @click="SQLToEs()"><=解析
+                            <el-button type="primary" class="el-button-search"
+                                       @click="SQLToEs()"><=解析
                             </el-button>
                         </el-form-item>
                     </el-form>
@@ -541,7 +563,7 @@
                             "boost": 1
                         }
                     },
-                    "size": 15,
+                    size: 15,
                     sort: "_score"
                 },
                 bootstrap_servers: {
@@ -671,6 +693,13 @@
                     content: '',
                     hintOptions: {tables: {}},
                     editor: null
+                },
+                HelperController_SQLToEsHelper_result: {
+                    "index": "TB_OBJECT_0088",
+                    "fields": [
+                        "*"
+                    ],
+                    "dslHelper": {}
                 }
             }
         },
@@ -739,7 +768,7 @@
             Search() {
                 let self = this;
                 //self.request._source = self.sources.checkedFields;//这个很重要 需要考虑是否启用
-                self.$http.post(self.api.Search + "/" + self.index + "/_search", self.request, {
+                self.$http.post(self.api.Search + self.index + "/_search", self.request, {
                     headers: {
                         "ES_HOST": self.headers.ES_HOST,
                         'content-type': 'application/json'
@@ -1132,7 +1161,10 @@
             DSLAdd(bool, type) {
                 //DSL 统一添加
                 let self = this;
-                const example = JSON.parse(JSON.stringify(self.DSL.example.show[type]))
+                const example = JSON.parse(JSON.stringify(self.DSL.example.show[type]));
+                if (null == self.DSL.data[bool][type]) {
+                    self.DSL.data[bool][type] = [];
+                }
                 if (type != 'ids') {
                     self.DSL.data[bool][type].push(example);
                 } else {
@@ -1145,6 +1177,7 @@
             }
             ,
             DSLRemove(bool, type, index) {
+                console.info("bool:" + bool + ",type:" + type + ";index:" + index)
                 //DSL统一移除
                 let self = this;
                 if (type != 'ids') {
@@ -1200,22 +1233,23 @@
                 });
                 self.sql.editor = editor;
             },
-
             SQLToEs() {
                 //SQL 转换成 ES
                 let self = this;
                 // debugger
                 const sql = this.sql.editor.getValue();
-                // const sql = this.sql.content;
-                self.$http.post(self.api.HelperController_SQLHelper, sql, {
+                self.$http.post(self.api.HelperController_SQLToEsHelper, sql, {
                     headers: {
                         "ES_HOST": self.headers.ES_HOST,
                         'content-type': 'application/json'
                     }
                 }, function (response) {
                     if (response.code == 0) {
-                        // self.Excel.dialog.urls = response.content;
-                        // self.Excel.dialog.dialogVisible = true;
+                        self.HelperController_SQLToEsHelper_result = response.content;
+                        self.index = self.HelperController_SQLToEsHelper_result.index;
+                        self.DSL.data = self.HelperController_SQLToEsHelper_result.dslHelper;
+                        // debugger
+                        // self.sources.checkedFields = self.HelperController_SQLToEsHelper_result.fields;
                     } else {
                         self.$message({
                             type: 'error',
@@ -1231,12 +1265,11 @@
                         duration: 1000
                     });
                 });
-                Loading.close();
             },
             ESToSQL() {
                 //ES 转换成 SQL
                 let self = this;
-                self.$http.post(self.api.HelperController_SQLHelper, self.sql.content, {
+                self.$http.post(self.api.HelperController_SQLToEsHelper, self.sql.content, {
                     headers: {
                         "ES_HOST": self.headers.ES_HOST,
                         'content-type': 'application/json'
