@@ -78,20 +78,23 @@
                                 <span @click="preByFileName(info.preRelationViewUrl)">别名</span>
                                 <span @click="routerToDocumentView(info.index)">文档</span>
                                 <span @click="routerToMappingView(info.index)">映射</span>
-                                <template v-if="info.status=='open'">
-                                <span @click="Index_OpenCloseController_Close(info.index)">
-                                    <span class="red">关闭</span></span>
-                                </template>
-                                <template v-else>
-                                    <span class="redSpan" @click="Index_OpenCloseController_Open(info.index)">打开</span>
-                                </template>
-                                <span @click="Index_FreshFlushController_Refresh(info.index)">refresh</span>
-                                <span @click="Index_FreshFlushController_Flush(info.index)">flush</span>
+                                <span @click="routerToDSLView(info.index)">DSL</span>
                                 <span @click="routerToShardView(info.index)">分片</span>
                                 <span @click="routerToSegmentView(info.index)">段</span>
-                                <span @click="routerToRecoveryView(info.index)">恢复</span>
-                                <span @click="routerToSettingView(info.index)">设置</span>
-                                <span @click="routerToDSLView(info.index)">DSL</span>
+                                <template v-if="role.role=='admin'">
+                                    <template v-if="info.status=='open'">
+                                         <span @click="Index_OpenCloseController_Close(info.index)">
+                                          <span class="red">关闭</span></span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="redSpan"
+                                              @click="Index_OpenCloseController_Open(info.index)">打开</span>
+                                    </template>
+                                    <span @click="Index_FreshFlushController_Refresh(info.index)">refresh</span>
+                                    <span @click="Index_FreshFlushController_Flush(info.index)">flush</span>
+                                    <span @click="routerToRecoveryView(info.index)">恢复</span>
+                                    <span @click="routerToSettingView(info.index)">设置</span>
+                                </template>
                             </td>
                         </tr>
                     </template>
@@ -168,6 +171,9 @@
                 },
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
+                },
+                role: {
+                    role: 'visitor'
                 }
             }
         },
@@ -179,7 +185,9 @@
             self.bootstrap = {};
             self.bootstrap_servers = {};
             self.ConfigController_GetServers();
-            self.Cluster_IndexController_Cat_Indices();
+            self.ConfigController_GetDefaultServers();
+            const role = this.$route.query && this.$route.query.role;
+            self.role.role = role;
 
 
         },
@@ -418,6 +426,30 @@
                                 message: '查询成功',
                                 duration: 2000
                             });
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            },
+            ConfigController_GetDefaultServers() {
+                //获取默认的地址
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetDefaultServers, {}, function (response) {
+                        if (response.code == 0) {
+                            self.headers.ES_HOST = response.content;
+                            self.Cluster_IndexController_Cat_Indices();
                         } else {
                             self.$message({
                                 type: 'error',

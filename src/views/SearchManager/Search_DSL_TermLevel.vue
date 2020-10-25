@@ -387,6 +387,16 @@
                                        @click="SQLToEs()"><=解析
                             </el-button>
                         </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search"
+                                       @click="sqlExample()">示例
+                            </el-button>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" class="el-button-search"
+                                       @click="sqlNotice()">注意
+                            </el-button>
+                        </el-form-item>
                     </el-form>
                 </el-col>
                 <el-col :span="11">
@@ -588,7 +598,7 @@
                 },
 
                 DSL: {
-                    bool: ['filter', 'must_not', 'should', 'must'],
+                    bool: ['must', 'must_not', 'filter', 'should'],
                     type: {
                         'is not null': 'exists',
                         'equal': 'term',
@@ -1268,33 +1278,61 @@
                 });
             },
             ESToSQL() {
-                //ES 转换成 SQL
-                let self = this;
-                self.$http.post(self.api.HelperController_SQLToEsHelper, self.sql.content, {
-                    headers: {
-                        "ES_HOST": self.headers.ES_HOST,
-                        'content-type': 'application/json'
-                    }
-                }, function (response) {
-                    if (response.code == 0) {
-                        // self.Excel.dialog.urls = response.content;
-                        // self.Excel.dialog.dialogVisible = true;
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
+                this.$alert('<pre>' + '暂未支持' + '</pre>', '注意', {
+                    dangerouslyUseHTMLString: true
                 });
-                Loading.close();
+                // //ES 转换成 SQL
+                // let self = this;
+                // self.$http.post(self.api.HelperController_SQLToEsHelper, self.sql.content, {
+                //     headers: {
+                //         "ES_HOST": self.headers.ES_HOST,
+                //         'content-type': 'application/json'
+                //     }
+                // }, function (response) {
+                //     if (response.code == 0) {
+                //         // self.Excel.dialog.urls = response.content;
+                //         // self.Excel.dialog.dialogVisible = true;
+                //     } else {
+                //         self.$message({
+                //             type: 'error',
+                //             message: response.msg,
+                //             duration: 2000
+                //         });
+                //     }
+                // }, function (response) {
+                //     //失败回调
+                //     self.$message({
+                //         type: 'warning',
+                //         message: '请求异常',
+                //         duration: 1000
+                //     });
+                // });
+            },
+            sqlExample() {
+                let self = this;
+                const example =
+                    `SELECT * FROM "tb_object_0088" WHERE
+"F1_0088" IS NOT NULL AND "F2_0088" IS NULL
+AND "F1_0088" = '1' AND "F1_0088" <> '1'
+AND "F1_0088" IN ('1','2') AND "F1_0088" NOT IN ('1','2')
+AND "F3_0088" BETWEEN 30 AND 40
+AND "F3_0088" >= 30 AND F3_0088 <= 30
+AND REGEXP_LIKE("F4_0088",'[\\u4e00-\\u9fa5]+') AND  NOT REGEXP_LIKE("F4_0088",'[0-9]*')
+AND "F4_0088" LIKE 'St%'  AND "F4_0088" NOT LIKE 'St%'
+                   `;
+                self.sql.editor.setValue(example);
+
+            }
+            ,
+            sqlNotice() {
+                const example =
+                    `1.只支持示例的语法,其他语法不支持(比如不等于只支持<>)
+2.表名,字段名称和值都要双引号
+3.只支持AND如果要OR请转换成正则/in或者检索多次
+4.正则不支持速记语法,请转成常规语法(\\d -> [0-9])`
+                this.$alert('<pre>' + example + '</pre>', '注意', {
+                    dangerouslyUseHTMLString: true
+                });
             }
         }
 
