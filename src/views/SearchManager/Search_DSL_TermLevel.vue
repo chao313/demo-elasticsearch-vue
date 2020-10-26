@@ -725,7 +725,6 @@
             const header_ES_HOST = this.$route.query && this.$route.query.header_ES_HOST;
             self.headers.ES_HOST = JSON.parse(header_ES_HOST);
             self.ConfigController_GetServers();
-            self.Index_MappingController_Mapping_Compatible();
             self.Search();
             //设置sql
 
@@ -777,6 +776,7 @@
             ,
             Search() {
                 let self = this;
+                self.Index_MappingController_Mapping_Compatible();//获取索引结构
                 //self.request._source = self.sources.checkedFields;//这个很重要 需要考虑是否启用
                 self.$http.post(self.api.Search + self.index + "/_search", self.request, {
                     headers: {

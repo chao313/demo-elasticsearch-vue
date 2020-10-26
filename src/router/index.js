@@ -84,7 +84,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster,
                 name: 'ClusterManager_Cluster',
                 meta: {
-                    title: 'Cluster集群信息'
+                    title: 'Cluster - 信息'
                 },
                 hidden: false
             },
@@ -93,7 +93,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Alias,
                 name: 'ClusterManager_Cluster_Alias',
                 meta: {
-                    title: 'Cluster集群别名'
+                    title: 'Cluster - 别名'
                 },
                 hidden: false
             },
@@ -102,7 +102,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Index,
                 name: 'ClusterManager_Cluster_Index',
                 meta: {
-                    title: 'Cluster集群索引'
+                    title: 'Cluster - 索引'
                 },
                 hidden: false
             },
@@ -111,7 +111,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_License,
                 name: 'ClusterManager_Cluster_License',
                 meta: {
-                    title: 'Cluster集群证书'
+                    title: 'Cluster - 证书'
                 },
                 hidden: false
             },
@@ -120,7 +120,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Node,
                 name: 'ClusterManager_Cluster_Node',
                 meta: {
-                    title: 'Cluster集群节点'
+                    title: 'Cluster - 节点'
                 },
                 hidden: false
             },
@@ -129,7 +129,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Plugin,
                 name: 'ClusterManager_Cluster_Plugin',
                 meta: {
-                    title: 'Cluster集群插件'
+                    title: 'Cluster - 插件'
                 },
                 hidden: false
             },
@@ -138,7 +138,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Repository,
                 name: 'ClusterManager_Cluster_Repository',
                 meta: {
-                    title: 'Cluster集群仓库'
+                    title: 'Cluster - 仓库'
                 },
                 hidden: false
             },
@@ -147,7 +147,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Segment,
                 name: 'ClusterManager_Cluster_Segment',
                 meta: {
-                    title: 'Cluster集群段'
+                    title: 'Cluster - 段'
                 },
                 hidden: false
             },
@@ -156,7 +156,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Shard,
                 name: 'ClusterManager_Cluster_Shard',
                 meta: {
-                    title: 'Cluster集群分片'
+                    title: 'Cluster - 分片'
                 },
                 hidden: false
             },
@@ -165,7 +165,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Snapshot,
                 name: 'ClusterManager_Cluster_Snapshot',
                 meta: {
-                    title: 'Cluster集群快照'
+                    title: 'Cluster - 快照'
                 },
                 hidden: false
             },
@@ -174,7 +174,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Task,
                 name: 'ClusterManager_Cluster_Task',
                 meta: {
-                    title: 'Cluster集群任务'
+                    title: 'Cluster - 任务'
                 },
                 hidden: false
             },
@@ -183,7 +183,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Template,
                 name: 'ClusterManager_Cluster_Template',
                 meta: {
-                    title: 'Cluster集群模板'
+                    title: 'Cluster - 模板'
                 },
                 hidden: false
             }, {
@@ -191,7 +191,7 @@ export const constantRouterMap = [
                 component: ClusterManager_Cluster_Task,
                 name: 'ClusterManager_Cluster_Task',
                 meta: {
-                    title: 'Cluster集群铂金'
+                    title: 'Cluster - 铂金'
                 },
                 hidden: false
             }
@@ -234,7 +234,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index,
                 name: 'IndexManager_Index',
                 meta: {
-                    title: 'Index信息'
+                    title: 'Index - 信息'
                 },
                 hidden: false
             },
@@ -243,7 +243,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index_Alias,
                 name: 'IndexManager_Index_Alias',
                 meta: {
-                    title: 'Index别名'
+                    title: 'Index - 别名'
                 },
                 hidden: false
             },
@@ -252,7 +252,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index_CRUD,
                 name: 'IndexManager_Index_CRUD',
                 meta: {
-                    title: 'IndexCRUD'
+                    title: 'Index - CRUD'
                 },
                 hidden: false
             },
@@ -261,25 +261,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index_Document,
                 name: 'IndexManager_Index_Document',
                 meta: {
-                    title: 'Index文档'
-                },
-                hidden: false
-            },
-            {
-                path: 'IndexManager_Index_FreezeUnFreeze',
-                component: IndexManager_Index_FreezeUnFreeze,
-                name: 'IndexManager_Index_FreezeUnFreeze',
-                meta: {
-                    title: 'Index冻结/解冻'
-                },
-                hidden: false
-            },
-            {
-                path: 'IndexManager_Index_FreshFlush',
-                component: IndexManager_Index_FreshFlush,
-                name: 'IndexManager_Index_FreshFlush',
-                meta: {
-                    title: 'Index刷新'
+                    title: 'Index - 文档'
                 },
                 hidden: false
             },
@@ -288,7 +270,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index_Mapping,
                 name: 'IndexManager_Index_Mapping',
                 meta: {
-                    title: 'Index映射'
+                    title: 'Index - 映射'
                 },
                 hidden: false
             },
@@ -297,16 +279,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index_NewIndex,
                 name: 'IndexManager_Index_NewIndex',
                 meta: {
-                    title: 'Index新索引'
-                },
-                hidden: false
-            },
-            {
-                path: 'IndexManager_Index_OpenClose',
-                component: IndexManager_Index_OpenClose,
-                name: 'IndexManager_Index_OpenClose',
-                meta: {
-                    title: 'Index开关'
+                    title: 'Index - 新索引'
                 },
                 hidden: false
             },
@@ -315,7 +288,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index_Recovery,
                 name: 'IndexManager_Index_Recovery',
                 meta: {
-                    title: 'Index恢复'
+                    title: 'Index - 恢复'
                 },
                 hidden: false
             },
@@ -324,7 +297,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index_Segment,
                 name: 'IndexManager_Index_Segment',
                 meta: {
-                    title: 'Index段'
+                    title: 'Index - 段'
                 },
                 hidden: false
             }
@@ -334,7 +307,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index_Setting,
                 name: 'IndexManager_Index_Setting',
                 meta: {
-                    title: 'Index设置'
+                    title: 'Index - 设置'
                 },
                 hidden: false
             },
@@ -343,7 +316,7 @@ export const constantRouterMap = [
                 component: IndexManager_Index_Shard,
                 name: 'IndexManager_Index_Shard',
                 meta: {
-                    title: 'Index分片'
+                    title: 'Index - 分片'
                 },
                 hidden: false
             }
@@ -374,7 +347,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_Analyze,
                 name: 'SearchManager_Search_Analyze',
                 meta: {
-                    title: 'Search分词检索'
+                    title: 'Search - 分词检索'
                 },
                 hidden: false
             },
@@ -383,7 +356,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_Count,
                 name: 'SearchManager_Search_Count',
                 meta: {
-                    title: 'Search数量检索'
+                    title: 'Search - 数量检索'
                 },
                 hidden: false
             },
@@ -392,7 +365,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_DSL_Compound,
                 name: 'SearchManager_Search_DSL_Compound',
                 meta: {
-                    title: 'SearchDSL组合检索'
+                    title: 'Search - DSL组合检索'
                 },
                 hidden: false
             },
@@ -401,7 +374,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_DSL_FullText,
                 name: 'SearchManager_Search_DSL_FullText',
                 meta: {
-                    title: 'SearchDSL全文检索'
+                    title: 'Search - 全文检索'
                 },
                 hidden: false
             },
@@ -410,7 +383,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_DSL_MatchAll,
                 name: 'SearchManager_Search_DSL_MatchAll',
                 meta: {
-                    title: 'SearchDSL匹配全部'
+                    title: 'Search - DSL匹配全部'
                 },
                 hidden: false
             },
@@ -419,7 +392,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_DSL_TermLevel,
                 name: 'SearchManager_Search_DSL_TermLevel',
                 meta: {
-                    title: 'SearchDSL术语检索'
+                    title: 'Search - DSL术语检索'
                 },
                 hidden: false
             },
@@ -428,7 +401,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_ExplainValidate,
                 name: 'SearchManager_Search_ExplainValidate',
                 meta: {
-                    title: 'Search解释/验证'
+                    title: 'Search - 解释/验证'
                 },
                 hidden: false
             },
@@ -437,7 +410,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_Lucene,
                 name: 'SearchManager_Search_Lucene',
                 meta: {
-                    title: 'SearchLucene检索'
+                    title: 'Search - Lucene检索'
                 },
                 hidden: false
             },
@@ -446,7 +419,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_Lucene_Example,
                 name: 'SearchManager_Search_Lucene_Example',
                 meta: {
-                    title: 'SearchLucene检索样例'
+                    title: 'Search - Lucene检索样例'
                 },
                 hidden: false
             },
@@ -455,7 +428,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_Script,
                 name: 'SearchManager_Search_Script',
                 meta: {
-                    title: 'Search脚本检索'
+                    title: 'Search - 脚本检索'
                 },
                 hidden: false
             },
@@ -464,7 +437,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_Scroll,
                 name: 'SearchManager_Search_Scroll',
                 meta: {
-                    title: 'Search滚动检索'
+                    title: 'Search - 滚动检索'
                 },
                 hidden: false
             },
@@ -473,7 +446,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_Shard,
                 name: 'SearchManager_Search_Shard',
                 meta: {
-                    title: 'Search分片检索'
+                    title: 'Search - 分片检索'
                 },
                 hidden: false
             },
@@ -482,7 +455,7 @@ export const constantRouterMap = [
                 component: SearchManager_Search_SQL,
                 name: 'SearchManager_Search_SQL',
                 meta: {
-                    title: 'SearchSQL检索'
+                    title: 'Search - SQL检索'
                 },
                 hidden: false
             }
@@ -497,7 +470,7 @@ export const constantRouterMap = [
             title: '资源管理'
         },
         noDropdown: true,
-        hidden: true,
+        hidden: false,
         children: [
             {
                 path: 'ResourceManagerList',
