@@ -136,7 +136,7 @@
                     "home": "192.168.0.105:9092"
                 },
                 headers: {//存放分页信息
-                    "ES_HOST": "http://39.107.236.187:7014"
+                    "ES_HOST": "http://10.200.5.217:9161/elasticsearch/"
                 },
                 topicSize: 0,
                 consumerSize: 0,

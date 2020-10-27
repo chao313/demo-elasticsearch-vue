@@ -583,7 +583,7 @@
                     servers: '192.168.0.105:9092'
                 },
                 headers: {
-                    "ES_HOST": "http://39.107.236.187:7014"
+                    "ES_HOST": "http://10.200.5.217:9161/elasticsearch/"
                 },
                 sources: {
                     checkAll: false,
@@ -1239,7 +1239,7 @@
                     }
                 })
                 // 代码自动提示功能，记住使用cursorActivity事件不要使用change事件，这是一个坑，那样页面直接会卡死
-                editor.on('cursorActivity', function () {
+                editor.on('inputRead', function () {
                     editor.showHint()
                 });
                 self.sql.editor = editor;
@@ -1318,7 +1318,7 @@ AND "F1_0088" IN ('1','2') AND "F1_0088" NOT IN ('1','2')
 AND "F3_0088" BETWEEN 30 AND 40
 AND "F3_0088" >= 30 AND F3_0088 <= 30
 AND REGEXP_LIKE("F4_0088",'[\\u4e00-\\u9fa5]+') AND  NOT REGEXP_LIKE("F4_0088",'[0-9]*')
-AND "F4_0088" LIKE 'St%'  AND "F4_0088" NOT LIKE 'St%'
+AND "F4_0088" LIKE 'St*'  AND "F4_0088" NOT LIKE 'St*'
                    `;
                 self.sql.editor.setValue(example);
 
@@ -1329,7 +1329,8 @@ AND "F4_0088" LIKE 'St%'  AND "F4_0088" NOT LIKE 'St%'
                     `1.只支持示例的语法,其他语法不支持(比如不等于只支持<>)
 2.表名,字段名称和值都要双引号
 3.只支持AND如果要OR请转换成正则/in或者检索多次
-4.正则不支持速记语法,请转成常规语法(\\d -> [0-9])`
+4.正则不支持速记语法,请转成常规语法(\\d -> [0-9])
+5.通配符使用*)`;
                 this.$alert('<pre>' + example + '</pre>', '注意', {
                     dangerouslyUseHTMLString: true
                 });

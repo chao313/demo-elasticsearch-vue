@@ -79,6 +79,7 @@
                                 <span @click="routerToDocumentView(info.index)">文档</span>
                                 <span @click="routerToMappingView(info.index)">映射</span>
                                 <span @click="routerToDSLView(info.index)">DSL</span>
+                                <span @click="routerToSQLView(info.index)">SQL</span>
                                 <span @click="routerToShardView(info.index)">分片</span>
                                 <span @click="routerToSegmentView(info.index)">段</span>
                                 <template v-if="role.role=='admin'">
@@ -527,6 +528,14 @@
                 const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
                 queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
                 window.open("#/SearchManager_Search_DSL_TermLevel" + "?" + queryStr, '_self');
+            }
+            ,
+            routerToSQLView(index) {
+                let self = this;
+                let queryStr = "";
+                const header_ES_HOST = JSON.stringify(self.headers.ES_HOST);
+                queryStr = queryStr + "index=" + index + "" + "&header_ES_HOST=" + header_ES_HOST;
+                window.open("#/SearchManager_Search_SQL" + "?" + queryStr, '_self');
             }
             ,
             searchEvent() {
