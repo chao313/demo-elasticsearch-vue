@@ -27,6 +27,7 @@
                                @click="sqlNotice()">注意
                     </el-button>
                 </el-form-item>
+                <!--
                 <el-form-item label="选择导出size" size="mini">
                     <el-select v-model="outPut.size" filterable @blur="selectBlur">
                         <el-option v-for=" item in outPut.level" :key="item" :label="item"
@@ -34,15 +35,15 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <!--                <el-form-item>-->
-                <!--                    <el-button type="primary" class="el-button-search" @click="outputToEvent('excel')">导出为Excel-->
-                <!--                    </el-button>-->
-                <!--                </el-form-item>-->
-                <!--                <el-form-item>-->
-                <!--                    <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">导出为DB-->
-                <!--                    </el-button>-->
-                <!--                </el-form-item>-->
-
+                <el-form-item>
+                    <el-button type="primary" class="el-button-search" @click="outputToEvent('excel')">导出为Excel
+                    </el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">导出为DB
+                    </el-button>
+                </el-form-item>
+               -->
             </el-form>
             <hr>
             <el-form size="mini" :inline="true">
@@ -239,13 +240,13 @@
                     size: 500
                 },
                 bootstrap_servers: {
-                    "home": "192.168.0.105:9092"
+                    "home": ""//192.168.0.105:9092
                 },
                 bootstrap: {
-                    servers: '192.168.0.105:9092'
+                    servers: ''//192.168.0.105:9092
                 },
                 headers: {
-                    "ES_HOST": "http://10.200.5.217:9161/elasticsearch/"
+                    "ES_HOST": ""
                 },
                 sources: {
                     checkAll: false,
@@ -328,11 +329,11 @@
                         self.result.mappings = response.content;
                         // debugger
                     } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
+                        // self.$message({
+                        //     type: 'error',
+                        //     message: response.msg,
+                        //     duration: 2000
+                        // });
                     }
                 }, function (response) {
                     //失败回调
@@ -342,8 +343,7 @@
                         duration: 1000
                     });
                 })
-            }
-            ,
+            },
             Search() {
                 let self = this;
                 // self.Index_MappingController_Mapping_Compatible();//获取索引结构
@@ -379,7 +379,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                     } else {
                         self.$message({
@@ -397,8 +397,7 @@
                     });
                 })
 
-            }
-            ,
+            },
             ConfigController_GetServers() {
                 let self = this;
                 self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
@@ -409,11 +408,11 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -430,19 +429,18 @@
                         });
                     }
                 )
-            }
-            ,
+            },
             ConfigController_GetMulti_match_fields() {
                 let self = this;
                 self.$http.get(self.api.ConfigController_GetMulti_match_fields, {}, function (response) {
                         if (response.code == 0) {
                             self.sources.fields = response.content;
 
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -459,18 +457,17 @@
                         });
                     }
                 )
-            }
-            ,
+            },
             ConfigController_GetMulti_match_fields_defaultList() {
                 let self = this;
                 self.$http.get(self.api.ConfigController_GetMulti_match_fields_defaultList, {}, function (response) {
                         if (response.code == 0) {
                             self.sources.checkedFields = response.content;
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -492,8 +489,7 @@
                 let self = this;
                 self.request.from = (currentChange - 1) * self.request.size;
                 self.Search();
-            }
-            ,
+            },
             outputToEvent(type) {
                 //导出为excel
                 let self = this;
@@ -523,8 +519,7 @@
                         duration: 1000
                     });
                 });
-            }
-            ,
+            },
             outputToExcel() {
                 //导出为excel
                 let self = this;
@@ -560,8 +555,7 @@
                     });
                 });
                 Loading.close();
-            }
-            ,
+            },
             outputToDb() {
                 //导出为excel
                 let self = this;
@@ -598,18 +592,7 @@
                 });
                 Loading.close();
             }
-            ,
-            searchRest() {
-                let self = this;
-                self.search.id = '';
-                self.search.title = '';
-                self.search.img = '';
-                self.search.time = '';
-                self.search.type = '';
-                self.search.lookSum = '';
-                self.search.content = '';
-                this.queryBase();
-            }
+
             ,
             Index_DocumentController_Delete(index, type, id) {
                 this.$confirm('是否删除该条索引？', '提示', {
@@ -659,7 +642,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                         self.pen(JSON.stringify(response.content, null, 2))
                     } else {

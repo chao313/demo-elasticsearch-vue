@@ -130,33 +130,13 @@
                     }
                 },
                 bootstrap: {
-                    servers: '192.168.0.105:9092'
+                    servers: ''//192.168.0.105:9092
                 },
                 bootstrap_servers: {
-                    "home": "192.168.0.105:9092"
+                    "home": "2"//192.168.0.105:909s
                 },
                 headers: {//存放分页信息
-                    "ES_HOST": "http://10.200.5.217:9161/elasticsearch/"
-                },
-                topicSize: 0,
-                consumerSize: 0,
-                clusterInfo: {
-                    controller: {
-                        port: 9092,
-                        idString: "",
-                        host: "192.168.0.105",
-                        id: 0,
-                    },
-                    nodes: [
-                        {
-                            port: 9092,
-                            idString: "xxx",
-                            host: "192.168.0.105",
-                            id: 0
-                        }
-                    ],
-                    clusterId: "1",
-                    authorizedOperations: []
+                    "ES_HOST": ""
                 }
             }
         }
@@ -182,8 +162,6 @@
         },
         watch: {},
         methods: {
-
-            //获取具体的配置
             Index_SettingController_Settings() {
                 let self = this;
                 self.$http.get(self.api.Index_SettingController_Settings + self.index + "/_settings", {
@@ -196,7 +174,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                     } else {
                         self.$message({
@@ -213,9 +191,7 @@
                         duration: 1000
                     });
                 })
-
-            }
-            ,
+            },
             Index_FreezeUnFreezeController_Freeze(index) {
                 this.$confirm('是否冻结该条索引？', '提示', {
                     confirmButtonText: '确定',
@@ -288,124 +264,6 @@
                     })
                 });
             },
-            getConsumerGroupSize() {
-                let self = this;
-                self.$http.get(self.api.getConsumerGroupSize, {
-                    params: {
-                        'bootstrap.servers': self.bootstrap.servers
-                    }
-                }, function (response) {
-
-                    if (response.code == 0) {
-                        self.consumerSize = response.content;
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                })
-
-            },
-            getKafkaBootstrapServers() {
-                let self = this;
-                self.$http.get(self.api.getKafkaBootstrapServers, {}, function (response) {
-                        if (response.code == 0) {
-                            self.bootstrap_servers = response.content;
-                            for (var key in self.bootstrap_servers) {
-                                //随机赋值
-                                // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
-                                self.bootstrap.servers = self.bootstrap_servers[key];
-                            }
-                            self.searchEvent();
-                            self.getTopicSize();
-                            self.getConsumerGroupSize();
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
-                        } else {
-                            self.$message({
-                                type: 'error',
-                                message: response.msg,
-                                duration: 2000
-                            });
-                        }
-                    }, function (response) {
-                        //失败回调
-                        self.$message({
-                            type: 'warning',
-                            message: '请求异常',
-                            duration: 1000
-                        });
-                    }
-                )
-            },
-            deleteByPrimaryKey(id) {
-                let self = this;
-                this.$confirm('是否删除该条数据？', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    center: true
-                }).then(() => {
-                    self.$http.get(self.api.deleteTBlogByPrimaryKey
-                        , {
-                            params: {
-                                id: id
-                            }
-                        },
-                        function (response) {
-                            if (response.code == 0) {
-                                if (response.content == true) {
-                                    self.$message({
-                                        type: 'success',
-                                        message: '删除成功',
-                                        duration: 2000
-                                    });
-                                    self.queryBase();
-                                } else {
-                                    self.$message({
-                                        type: 'warning',
-                                        message: '删除失败',
-                                        duration: 2000
-                                    });
-
-                                }
-                            } else {
-                                self.$message({
-                                    type: 'error',
-                                    message: response.msg,
-                                    duration: 2000
-                                });
-                            }
-                        },
-                        function (response) {
-                            console.log(response);
-                            //失败回调
-                            self.$message({
-                                type: 'error',
-                                message: "请求异常",
-                                duration: 2000
-                            });
-                        }
-                    )
-
-                })
-            },
             ConfigController_GetServers() {
                 let self = this;
                 self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
@@ -416,11 +274,11 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -438,47 +296,10 @@
                     }
                 )
             },
-            routerToConfigsView(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/BrokerManagerConfigsView" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicManagerList(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicManagerList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicPartitionOffsetList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicPartitionOffsetList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToConsumerManagerList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/ConsumerManagerList" + "?" + queryStr, '_self');
-            }
-            ,
             searchEvent() {
                 this.queryBase();
             }
-            ,
-            searchRest() {
-                let self = this;
-                self.search.id = '';
-                self.search.title = '';
-                self.search.img = '';
-                self.search.time = '';
-                self.search.type = '';
-                self.search.lookSum = '';
-                self.search.content = '';
-                this.queryBase();
-            }
+
 
         }
 

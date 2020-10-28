@@ -3,7 +3,7 @@
         <div class="mt20">
             <el-form :inline="true" size="mini">
                 <el-form-item label="bootstrap.servers">
-                    <el-select v-model="bootstrap.servers" placeholder="请输入kafka地址:">
+                    <el-select v-model="headers.ES_HOST" placeholder="请输入ES地址:">
                         <el-option v-for="(item,index) in bootstrap_servers" :key="item" :label="index"
                                    :value="item">
                         </el-option>
@@ -98,9 +98,9 @@
                 Index_Cat_Count_Result:
                     [
                         {
-                            "epoch": "1602427776",
-                            "timestamp": "14:49:36",
-                            "count": "样例数据"
+                            "epoch": "-",//1602427776
+                            "timestamp": "-",//14:49:36
+                            "count": "-"//样例数据
                         }
                     ],
                 Index_Cat_Indices_Result: [
@@ -118,31 +118,14 @@
                     }
                 ],
                 bootstrap: {
-                    servers: '192.168.0.105:9092'
+                    servers: ''//192.168.0.105:9092
                 },
                 bootstrap_servers: {
-                    "home": "192.168.0.105:9092"
+                    "home": ""//192.168.0.105:9092
                 },
-                topicSize: 0,
-                consumerSize: 0,
-                clusterInfo: {
-                    controller: {
-                        port: 9092,
-                        idString: "",
-                        host: "192.168.0.105",
-                        id: 0,
-                    },
-                    nodes: [
-                        {
-                            port: 9092,
-                            idString: "xx",
-                            host: "192.168.0.105",
-                            id: 0
-                        }
-                    ],
-                    clusterId: "1",
-                    authorizedOperations: []
-                }
+                headers: {//存放分页信息
+                    ES_HOST: ""
+                },
             }
         },
         mounted() {
@@ -152,26 +135,29 @@
             let self = this;
             const index = this.$route.query && this.$route.query.index;
             self.index = index;
-            self.Index_Cat_Count();
-            self.Index_Cat_Indices();
+            self.ConfigController_GetServers();
+            self.ConfigController_GetDefaultServers();
 
         },
         watch: {},
-        methods: {//获取具体的配置
+        methods: {
             Index_Cat_Count() {
                 let self = this;
                 self.$http.get(self.api.Index_Cat_Count + "/" + self.index, {
                     params: {
                         'format': 'JSON'
+                    },
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST,
                     }
                 }, function (response) {
                     if (response.code == 0) {
                         self.Index_Cat_Count_Result = response.content;
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
+                        // self.$message({
+                        //     type: 'success',
+                        //     message: '查询成功',
+                        //     duration: 1000
+                        // });
                     } else {
                         self.$message({
                             type: 'error',
@@ -189,7 +175,6 @@
                 })
 
             },
-
             Index_Cat_Indices() {
                 let self = this;
                 self.$http.get(self.api.Index_Cat_Indices + "/" + self.index, {
@@ -202,7 +187,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                     } else {
                         self.$message({
@@ -221,106 +206,37 @@
                 })
 
             },
-
-            queryBase() {
-                let self = this;
-                self.$http.get(self.api.getCluster, {
-                    params: {
-                        'bootstrap.servers': self.bootstrap.servers
-                    }
-                }, function (response) {
-
-                    if (response.code == 0) {
-                        self.clusterInfo = response.content;
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                })
-
+            searchEvent() {
+                this.queryBase();
             },
-            getTopicSize() {
+            ConfigController_GetDefaultServers() {
+                //获取默认的地址
                 let self = this;
-                self.$http.get(self.api.getTopicSize, {
-                    params: {
-                        'bootstrap.servers': self.bootstrap.servers
-                    }
-                }, function (response) {
-
-                    if (response.code == 0) {
-                        self.topicSize = response.content;
+                self.$http.get(self.api.ConfigController_GetDefaultServers, {}, function (response) {
+                        if (response.code == 0) {
+                            self.headers.ES_HOST = response.content;
+                            self.Index_Cat_Count();
+                            self.Index_Cat_Indices();
+                        } else {
+                            // self.$message({
+                            //     type: 'error',
+                            //     message: response.msg,
+                            //     duration: 2000
+                            // });
+                        }
+                    }, function (response) {
+                        //失败回调
                         self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
                         });
                     }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                })
-
+                )
             },
-            getConsumerGroupSize() {
+            ConfigController_GetServers() {
                 let self = this;
-                self.$http.get(self.api.getConsumerGroupSize, {
-                    params: {
-                        'bootstrap.servers': self.bootstrap.servers
-                    }
-                }, function (response) {
-
-                    if (response.code == 0) {
-                        self.consumerSize = response.content;
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                })
-
-            },
-            getKafkaBootstrapServers() {
-                let self = this;
-                self.$http.get(self.api.getKafkaBootstrapServers, {}, function (response) {
+                self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
                         if (response.code == 0) {
                             self.bootstrap_servers = response.content;
                             for (var key in self.bootstrap_servers) {
@@ -328,14 +244,11 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.searchEvent();
-                            self.getTopicSize();
-                            self.getConsumerGroupSize();
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -353,99 +266,7 @@
                     }
                 )
             },
-            deleteByPrimaryKey(id) {
-                let self = this;
-                this.$confirm('是否删除该条数据？', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    center: true
-                }).then(() => {
-                    self.$http.get(self.api.deleteTBlogByPrimaryKey
-                        , {
-                            params: {
-                                id: id
-                            }
-                        },
-                        function (response) {
-                            if (response.code == 0) {
-                                if (response.content == true) {
-                                    self.$message({
-                                        type: 'success',
-                                        message: '删除成功',
-                                        duration: 2000
-                                    });
-                                    self.queryBase();
-                                } else {
-                                    self.$message({
-                                        type: 'warning',
-                                        message: '删除失败',
-                                        duration: 2000
-                                    });
 
-                                }
-                            } else {
-                                self.$message({
-                                    type: 'error',
-                                    message: response.msg,
-                                    duration: 2000
-                                });
-                            }
-                        },
-                        function (response) {
-                            console.log(response);
-                            //失败回调
-                            self.$message({
-                                type: 'error',
-                                message: "请求异常",
-                                duration: 2000
-                            });
-                        }
-                    )
-
-                })
-            }
-            ,
-            routerToConfigsView(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/BrokerManagerConfigsView" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicManagerList(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicManagerList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicPartitionOffsetList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicPartitionOffsetList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToConsumerManagerList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/ConsumerManagerList" + "?" + queryStr, '_self');
-            }
-            ,
-            searchEvent() {
-                this.queryBase();
-            }
-            ,
-            searchRest() {
-                let self = this;
-                self.search.id = '';
-                self.search.title = '';
-                self.search.img = '';
-                self.search.time = '';
-                self.search.type = '';
-                self.search.lookSum = '';
-                self.search.content = '';
-                this.queryBase();
-            }
 
         }
 

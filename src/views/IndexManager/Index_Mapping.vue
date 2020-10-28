@@ -82,13 +82,13 @@
                     }
                 },
                 bootstrap_servers: {
-                    "home": "192.168.0.105:9092"
+                    "home": ""//192.168.0.105:9092
                 },
                 bootstrap: {
-                    servers: '192.168.0.105:9092'
+                    servers: ''//192.168.0.105:9092
                 },
                 headers: {
-                    "ES_HOST": "http://10.200.5.217:9161/elasticsearch/"
+                    "ES_HOST": ""
                 }
             }
         },
@@ -103,7 +103,6 @@
             self.headers.ES_HOST = JSON.parse(header_ES_HOST);
             self.ConfigController_GetServers();
             self.Index_MappingController_Mapping_Compatible();
-
         },
         watch: {},
         methods: {//获取具体的配置
@@ -119,7 +118,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                     } else {
                         self.$message({
@@ -149,11 +148,11 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -171,48 +170,9 @@
                     }
                 )
             },
-            routerToConfigsView(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/BrokerManagerConfigsView" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicManagerList(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicManagerList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicPartitionOffsetList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicPartitionOffsetList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToConsumerManagerList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/ConsumerManagerList" + "?" + queryStr, '_self');
-            }
-            ,
             searchEvent() {
                 this.queryBase();
             }
-            ,
-            searchRest() {
-                let self = this;
-                self.search.id = '';
-                self.search.title = '';
-                self.search.img = '';
-                self.search.time = '';
-                self.search.type = '';
-                self.search.lookSum = '';
-                self.search.content = '';
-                this.queryBase();
-            }
-
         }
 
     }

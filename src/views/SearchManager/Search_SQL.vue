@@ -39,21 +39,23 @@
                                @click="sqlNotice()">注意
                     </el-button>
                 </el-form-item>
-                <el-form-item label="选择导出size" size="mini">
-                    <el-select v-model="outPut.size" filterable @blur="selectBlur">
-                        <el-option v-for=" item in outPut.level" :key="item" :label="item"
-                                   :value="item">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" class="el-button-search" @click="outputToEvent('excel')">导出为Excel
-                    </el-button>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">导出为DB
-                    </el-button>
-                </el-form-item>
+                <template v-if="role.role=='admin'">
+                    <el-form-item label="选择导出size" size="mini">
+                        <el-select v-model="outPut.size" filterable @blur="selectBlur">
+                            <el-option v-for=" item in outPut.level" :key="item" :label="item"
+                                       :value="item">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" class="el-button-search" @click="outputToEvent('excel')">导出为Excel
+                        </el-button>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">导出为DB
+                        </el-button>
+                    </el-form-item>
+                </template>
             </el-form>
             <hr>
             <el-collapse>
@@ -263,7 +265,7 @@
                     servers: '192.168.0.105:9092'
                 },
                 headers: {
-                    "ES_HOST": "http://10.200.5.217:9161/elasticsearch/"
+                    "ES_HOST": ""
                 },
                 sources: {
                     checkAll: false,
@@ -437,12 +439,12 @@
                         }
                         self.sources.fields = keys;
                         self.sources.checkedFields = keys;
-
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
+                        //
+                        // self.$message({
+                        //     type: 'success',
+                        //     message: '查询成功',
+                        //     duration: 1000
+                        // });
                     } else {
                         self.$message({
                             type: 'error',
@@ -485,7 +487,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                     } else {
                         self.$message({
@@ -515,11 +517,11 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -706,18 +708,7 @@
                 });
                 Loading.close();
             }
-            ,
-            searchRest() {
-                let self = this;
-                self.search.id = '';
-                self.search.title = '';
-                self.search.img = '';
-                self.search.time = '';
-                self.search.type = '';
-                self.search.lookSum = '';
-                self.search.content = '';
-                this.queryBase();
-            }
+
             ,
             Index_DocumentController_Delete(index, type, id) {
                 this.$confirm('是否删除该条索引？', '提示', {
@@ -767,7 +758,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                         self.pen(JSON.stringify(response.content, null, 2))
                     } else {
@@ -1039,8 +1030,6 @@ AND "F4_0088" LIKE 'St*'  AND "F4_0088" NOT LIKE 'St*'
                 )
             },
         }
-
-
     }
 </script>
 

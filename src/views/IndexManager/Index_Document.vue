@@ -134,59 +134,59 @@
                     }
                 },
                 Search_DSL_MatchAllController_Search_Result: {
-                    "_shards": {
-                        "total": 1,
-                        "failed": 0,
-                        "successful": 1,
-                        "skipped": 0
+                    _shards: {
+                        total: 1,
+                        failed: 0,
+                        successful: 1,
+                        skipped: 0
                     },
-                    "hits": {
-                        "hits": [
+                    hits: {
+                        hit: [
                             {
-                                "_index": "tb_object_0088",
-                                "_type": "tb_object_0088",
-                                "_source": {
+                                _index: "tb_object_0088",
+                                _type: "tb_object_0088",
+                                _source: {
                                     "F24_0088": "百度地图(116.43138,39.953785);",
                                     "F21_0088": "总局",
                                     "RP_GEN_DATETIME": "2020-09-15 17:37:26",
                                     "F12_0088": "20021219"
                                 },
-                                "_id": "4a21d370-3149-4e0c-8f2f-76ef68bde8d1",
-                                "_score": 1
+                                _id: "4a21d370-3149-4e0c-8f2f-76ef68bde8d1",
+                                _score: 1
                             }
                         ],
-                        "total": {
+                        total: {
                             "value": 30,
                             "relation": "eq"
                         },
-                        "max_score": 1
+                        max_score: 1
                     },
-                    "took": 11,
-                    "timed_out": false,
-                    "compatible_total": 0 //兼容size
+                    took: 11,
+                    timed_out: false,
+                    compatible_total: 0 //兼容size
                 }
                 ,
                 request: {
-                    "_source": [
+                    _source: [
                         "*"
                     ],
-                    "from": 0,
-                    "query": {
+                    from: 0,
+                    query: {
                         "match_all": {
                             "boost": 1
                         }
                     },
-                    "size": 15,
-                    sort:"_score"
-                },
-                bootstrap_servers: {
-                    "home": "192.168.0.105:9092"
+                    size: 15,
+                    sort: "_score"
                 },
                 bootstrap: {
-                    servers: '192.168.0.105:9092'
+                    servers: ''//192.168.0.105:9092
+                },
+                bootstrap_servers: {
+                    "home": ""//192.168.0.105:9092
                 },
                 headers: {
-                    "ES_HOST": "http://10.200.5.217:9161/elasticsearch/"
+                    "ES_HOST": ""
                 },
                 sources: {
                     checkAll: false,
@@ -215,8 +215,7 @@
             self.headers.ES_HOST = JSON.parse(header_ES_HOST);
             self.ConfigController_GetServers();
             self.Index_MappingController_Mapping_Compatible();
-            self.Search_DSL_MatchAllController_Search();//匹配全部
-
+            self.Search_DSL_MatchAllController_Search();
         },
         watch: {},
         methods: {//获取具体的配置
@@ -237,11 +236,11 @@
                         self.sources.fields = keys;
                         self.sources.checkedFields = keys;
 
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
+                        // self.$message({
+                        //     type: 'success',
+                        //     message: '查询成功',
+                        //     duration: 1000
+                        // });
                     } else {
                         self.$message({
                             type: 'error',
@@ -281,7 +280,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                     } else {
                         self.$message({
@@ -310,11 +309,11 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -336,29 +335,9 @@
                 let self = this;
                 self.request.from = (currentChange - 1) * self.request.size;
                 self.Search_DSL_MatchAllController_Search();
-            }
-            ,
-
-            routerToConsumerManagerList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/ConsumerManagerList" + "?" + queryStr, '_self');
-            }
-            ,
+            },
             searchEvent() {
                 this.Search_DSL_MatchAllController_Search();
-            }
-            ,
-            searchRest() {
-                let self = this;
-                self.search.id = '';
-                self.search.title = '';
-                self.search.img = '';
-                self.search.time = '';
-                self.search.type = '';
-                self.search.lookSum = '';
-                self.search.content = '';
-                this.queryBase();
             },
             Index_DocumentController_Delete(index, type, id) {
                 this.$confirm('是否删除该条索引？', '提示', {
@@ -407,7 +386,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                         self.pen(JSON.stringify(response.content, null, 2))
                     } else {

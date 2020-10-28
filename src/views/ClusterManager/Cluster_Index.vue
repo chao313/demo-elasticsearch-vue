@@ -82,6 +82,7 @@
                                 <span @click="routerToSQLView(info.index)">SQL</span>
                                 <span @click="routerToShardView(info.index)">分片</span>
                                 <span @click="routerToSegmentView(info.index)">段</span>
+                                <span @click="routerToRecoveryView(info.index)">恢复</span>
                                 <template v-if="role.role=='admin'">
                                     <template v-if="info.status=='open'">
                                          <span @click="Index_OpenCloseController_Close(info.index)">
@@ -93,7 +94,6 @@
                                     </template>
                                     <span @click="Index_FreshFlushController_Refresh(info.index)">refresh</span>
                                     <span @click="Index_FreshFlushController_Flush(info.index)">flush</span>
-                                    <span @click="routerToRecoveryView(info.index)">恢复</span>
                                     <span @click="routerToSettingView(info.index)">设置</span>
                                 </template>
                             </td>
@@ -124,14 +124,14 @@
         data() {
             return {
                 Cluster_IndexController_Cat_Indices_Result: {
-                    "endRow": 10,
-                    "firstPage": 1,
-                    "hasNextPage": true,
-                    "hasPreviousPage": false,
-                    "isFirstPage": true,
-                    "isLastPage": false,
-                    "lastPage": 8,
-                    "list": [
+                    endRow: 10,
+                    firstPage: 1,
+                    hasNextPage: true,
+                    hasPreviousPage: false,
+                    isFirstPage: true,
+                    isLastPage: false,
+                    lastPage: 8,
+                    list: [
                         {
                             "pri.store.size": "",
                             "docs.deleted": "",
@@ -145,23 +145,23 @@
                             "docs.count": ""
                         }
                     ],
-                    "navigatePages": 8,
-                    "navigatepageNums": [1, 2, 3, 4, 5, 6, 7, 8],
-                    "nextPage": 2,
-                    "orderBy": "18ff48aa-258e-40ef-b555-0843dfad462c",
-                    "pageNum": 1,
-                    "pageSize": 10,
-                    "pages": 10,
-                    "prePage": 0,
-                    "size": 10,
-                    "startRow": 1,
-                    "total": 18100
+                    navigatePages: 8,
+                    navigatepageNums: [1, 2, 3, 4, 5, 6, 7, 8],
+                    nextPage: 2,
+                    orderBy: "18ff48aa-258e-40ef-b555-0843dfad462c",
+                    pageNum: 1,
+                    pageSize: 10,
+                    pages: 10,
+                    prePage: 0,
+                    size: 10,
+                    startRow: 1,
+                    total: 18100
                 },
                 headers: {//存放分页信息
-                    "ES_HOST": "http://10.202.16.9:9200",
-                    "ES_PAGE": "true",
-                    "ES_PAGE_SIZE": "15",
-                    "ES_FILTER": {
+                    ES_HOST: "http://10.202.16.9:9200",
+                    ES_PAGE: "true",
+                    ES_PAGE_SIZE: "15",
+                    ES_FILTER: {
                         "index": "*",
                         "health": "*",
                         "status": "*"
@@ -171,7 +171,7 @@
                     servers: '192.168.0.105:9092'
                 },
                 bootstrap_servers: {
-                    "home": "192.168.0.105:9092"
+                    "home": ""//192.168.0.105:9092
                 },
                 role: {
                     role: 'visitor'
@@ -194,7 +194,6 @@
         },
         watch: {},
         methods: {
-
             //获取全部的索引
             Cluster_IndexController_Cat_Indices() {
                 let self = this;
@@ -214,7 +213,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                     } else {
                         self.$message({
@@ -422,11 +421,11 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 2000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -452,11 +451,11 @@
                             self.headers.ES_HOST = response.content;
                             self.Cluster_IndexController_Cat_Indices();
                         } else {
-                            self.$message({
-                                type: 'error',
-                                message: response.msg,
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'error',
+                            //     message: response.msg,
+                            //     duration: 2000
+                            // });
                         }
                     }, function (response) {
                         //失败回调
@@ -541,21 +540,7 @@
             searchEvent() {
                 this.Cluster_IndexController_Cat_Indices();
             }
-            ,
-            searchRest() {
-                let self = this;
-                self.search.id = '';
-                self.search.title = '';
-                self.search.img = '';
-                self.search.time = '';
-                self.search.type = '';
-                self.search.lookSum = '';
-                self.search.content = '';
-                this.queryBase();
-            }
-
         }
-
     }
 </script>
 

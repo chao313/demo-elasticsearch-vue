@@ -29,21 +29,23 @@
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
                 </el-form-item>
-                <el-form-item label="选择导出size" size="mini">
-                    <el-select v-model="outPut.size" filterable @blur="selectBlur">
-                        <el-option v-for=" item in outPut.level" :key="item" :label="item"
-                                   :value="item">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" class="el-button-search" @click="outputToEvent('excel')">导出为Excel
-                    </el-button>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">导出为DB
-                    </el-button>
-                </el-form-item>
+                <template v-if="role.role=='admin'">
+                    <el-form-item label="选择导出size" size="mini">
+                        <el-select v-model="outPut.size" filterable @blur="selectBlur">
+                            <el-option v-for=" item in outPut.level" :key="item" :label="item"
+                                       :value="item">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" class="el-button-search" @click="outputToEvent('excel')">导出为Excel
+                        </el-button>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">导出为DB
+                        </el-button>
+                    </el-form-item>
+                </template>
             </el-form>
             <hr>
             <el-collapse>
@@ -585,7 +587,7 @@
                     servers: '192.168.0.105:9092'
                 },
                 headers: {
-                    "ES_HOST": "http://10.200.5.217:9161/elasticsearch/"
+                    "ES_HOST": ""
                 },
                 sources: {
                     checkAll: false,
@@ -757,11 +759,11 @@
                         self.sources.fields = keys;
                         self.sources.checkedFields = keys;
 
-                        self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
-                        });
+                        // self.$message({
+                        //     type: 'success',
+                        //     message: '查询成功',
+                        //     duration: 1000
+                        // });
                     } else {
                         self.$message({
                             type: 'error',
@@ -804,7 +806,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                     } else {
                         self.$message({
@@ -834,11 +836,11 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -861,15 +863,7 @@
                 let self = this;
                 self.request.from = (currentChange - 1) * self.request.size;
                 self.Search();
-            }
-            ,
-
-            routerToConsumerManagerList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/ConsumerManagerList" + "?" + queryStr, '_self');
-            }
-            ,
+            },
             searchEvent() {
                 //DSLParse
                 let self = this;
@@ -878,7 +872,6 @@
                         self.request.query = response.content;
                         self.request.from = 0;//这个比较重要 经常在上面吃亏! 存储不清除
                         self.Search();
-
                     } else {
                         self.$message({
                             type: 'error',
@@ -909,7 +902,6 @@
                             //导出为db
                             self.outputToDb();
                         }
-
                     } else {
                         self.$message({
                             type: 'error',
@@ -925,8 +917,7 @@
                         duration: 1000
                     });
                 });
-            }
-            ,
+            },
             outputToExcel() {
                 //导出为excel
                 let self = this;
@@ -1000,18 +991,7 @@
                 });
                 Loading.close();
             }
-            ,
-            searchRest() {
-                let self = this;
-                self.search.id = '';
-                self.search.title = '';
-                self.search.img = '';
-                self.search.time = '';
-                self.search.type = '';
-                self.search.lookSum = '';
-                self.search.content = '';
-                this.queryBase();
-            }
+
             ,
             Index_DocumentController_Delete(index, type, id) {
                 this.$confirm('是否删除该条索引？', '提示', {
@@ -1061,7 +1041,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                         self.pen(JSON.stringify(response.content, null, 2))
                     } else {

@@ -35,11 +35,8 @@ const IndexManager_Index = r => require.ensure([], () => r(require('@/views/Inde
 const IndexManager_Index_Alias = r => require.ensure([], () => r(require('@/views/IndexManager/Index_Alias')), 'IndexManager_Index_Alias');
 const IndexManager_Index_CRUD = r => require.ensure([], () => r(require('@/views/IndexManager/Index_CRUD')), 'IndexManager_Index_CRUD');
 const IndexManager_Index_Document = r => require.ensure([], () => r(require('@/views/IndexManager/Index_Document')), 'IndexManager_Index_Document');
-const IndexManager_Index_FreezeUnFreeze = r => require.ensure([], () => r(require('@/views/IndexManager/Index_FreezeUnFreeze')), 'IndexManager_Index_FreezeUnFreeze');
-const IndexManager_Index_FreshFlush = r => require.ensure([], () => r(require('@/views/IndexManager/Index_FreshFlush')), 'IndexManager_Index_FreshFlush');
 const IndexManager_Index_Mapping = r => require.ensure([], () => r(require('@/views/IndexManager/Index_Mapping')), 'IndexManager_Index_Mapping');
 const IndexManager_Index_NewIndex = r => require.ensure([], () => r(require('@/views/IndexManager/Index_NewIndex')), 'IndexManager_Index_NewIndex');
-const IndexManager_Index_OpenClose = r => require.ensure([], () => r(require('@/views/IndexManager/Index_OpenClose')), 'IndexManager_Index_OpenClose');
 const IndexManager_Index_Recovery = r => require.ensure([], () => r(require('@/views/IndexManager/Index_Recovery')), 'IndexManager_Index_Recovery');
 const IndexManager_Index_Segment = r => require.ensure([], () => r(require('@/views/IndexManager/Index_Segment')), 'IndexManager_Index_Segment');
 const IndexManager_Index_Setting = r => require.ensure([], () => r(require('@/views/IndexManager/Index_Setting')), 'IndexManager_Index_Setting');

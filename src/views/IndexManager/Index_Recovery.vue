@@ -132,14 +132,14 @@
             return {
                 index: '样例数据',
                 Index_RecoveryController_Cat_Recovery_Result: {
-                    "endRow": 10,
-                    "firstPage": 1,
-                    "hasNextPage": true,
-                    "hasPreviousPage": false,
-                    "isFirstPage": true,
-                    "isLastPage": false,
-                    "lastPage": 8,
-                    "list": [
+                    endRow: 10,
+                    firstPage: 1,
+                    hasNextPage: true,
+                    hasPreviousPage: false,
+                    isFirstPage: true,
+                    isLastPage: false,
+                    lastPage: 8,
+                    list: [
                         {
                             "index": "-",//index_bulk 索引名称
                             "shard": "-",//0 分片名称
@@ -165,29 +165,29 @@
                             "translog_ops_percent": "-"//100.0% 传输日志百分比
                         }
                     ],
-                    "navigatePages": 8,
-                    "navigatepageNums": [1, 2, 3, 4, 5, 6, 7, 8],
-                    "nextPage": 2,
-                    "orderBy": "18ff48aa-258e-40ef-b555-0843dfad462c",
-                    "pageNum": 1,
-                    "pageSize": 10,
-                    "pages": 10,
-                    "prePage": 0,
-                    "size": 10,
-                    "startRow": 1,
-                    "total": 18100
+                    navigatePages: 8,
+                    navigatepageNums: [1, 2, 3, 4, 5, 6, 7, 8],
+                    nextPage: 2,
+                    orderBy: "18ff48aa-258e-40ef-b555-0843dfad462c",
+                    pageNum: 1,
+                    pageSize: 10,
+                    pages: 10,
+                    prePage: 0,
+                    size: 10,
+                    startRow: 1,
+                    total: 18100
                 },
                 bootstrap_servers: {
-                    "home": "192.168.0.105:9092"
+                    "home": ""//192.168.0.105:9092
                 },
                 bootstrap: {
-                    servers: '192.168.0.105:9092'
+                    servers: ''//192.168.0.105:9092
                 },
                 headers: {//存放分页信息
-                    "ES_HOST": "http://10.200.5.217:9161/elasticsearch/",
-                    "ES_PAGE": "true",
-                    "ES_PAGE_SIZE": "15",
-                    "ES_FILTER": {}
+                    ES_HOST: "",
+                    ES_PAGE: "true",
+                    ES_PAGE_SIZE: "15",
+                    ES_FILTER: {}
                 },
             }
         },
@@ -225,7 +225,7 @@
                         self.$message({
                             type: 'success',
                             message: '查询成功',
-                            duration: 2000
+                            duration: 1000
                         });
                     } else {
                         self.$message({
@@ -242,9 +242,7 @@
                         duration: 1000
                     });
                 })
-
-            }
-            ,
+            },
             ConfigController_GetServers() {
                 let self = this;
                 self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
@@ -255,11 +253,11 @@
                                 // console.log("属性：" + key + ",值 ：" + self.bootstrap_servers[key]);
                                 self.bootstrap.servers = self.bootstrap_servers[key];
                             }
-                            self.$message({
-                                type: 'success',
-                                message: '查询成功',
-                                duration: 2000
-                            });
+                            // self.$message({
+                            //     type: 'success',
+                            //     message: '查询成功',
+                            //     duration: 1000
+                            // });
                         } else {
                             self.$message({
                                 type: 'error',
@@ -311,48 +309,9 @@
                 })
             }
             ,
-            routerToConfigsView(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/BrokerManagerConfigsView" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicManagerList(bootstrap_servers) {
-                //跳转携带参数
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicManagerList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToTopicPartitionOffsetList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/TopicPartitionOffsetList" + "?" + queryStr, '_self');
-            }
-            ,
-            routerToConsumerManagerList(bootstrap_servers) {
-                let queryStr = "";
-                queryStr = queryStr + "bootstrap_servers=" + bootstrap_servers + "";
-                window.open("#/ConsumerManagerList" + "?" + queryStr, '_self');
-            }
-            ,
             searchEvent() {
                 this.queryBase();
             }
-            ,
-            searchRest() {
-                let self = this;
-                self.search.id = '';
-                self.search.title = '';
-                self.search.img = '';
-                self.search.time = '';
-                self.search.type = '';
-                self.search.lookSum = '';
-                self.search.content = '';
-                this.queryBase();
-            }
-
         }
 
     }
