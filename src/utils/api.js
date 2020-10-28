@@ -40,9 +40,11 @@ export default {
     /** redis **/
     "RedisController_GetRecordByScrollId": BASE_URL + '/RedisController/getRecordByScrollId',//RedisController/getRecordByScrollId
 
-    /** 获取服务地址 **/
-    "ConfigController_GetServers": BASE_URL + '/ConfigController/getServers',
+    /**配置**/
+    "ConfigController_GetServers": BASE_URL + '/ConfigController/getServers',//获取服务地址
     "ConfigController_GetDefaultServers": BASE_URL + '/ConfigController/getDefaultServers',//获取默认值
+    "ConfigController_GetMulti_match_fields": BASE_URL + '/ConfigController/getMulti_match_fields',//getMulti_match_fields
+    "ConfigController_GetMulti_match_fields_defaultList": BASE_URL + '/ConfigController/getMulti_match_fields_defaultList',//获取多字段默认选中匹配地址
 
     /** helper服务地址 **/
     "HelperController_DSLHelper": BASE_URL + '/HelperController/DSLHelper',

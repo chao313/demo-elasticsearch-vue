@@ -20,7 +20,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
+                    <el-button type="primary" class="el-button-search" @click="Search()">查询</el-button>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="el-button-search"
@@ -45,9 +45,9 @@
 
             </el-form>
             <hr>
-            <el-form size="mini"  :inline="true" >
+            <el-form size="mini" :inline="true">
                 <el-form-item label="字段值" size="mini">
-                    <el-input size="mini" v-model="request.query.query"
+                    <el-input size="mini" v-model="request.query.multi_match.query"
                               placeholder="vlaue"></el-input>
                 </el-form-item>
             </el-form>
@@ -75,47 +75,52 @@
         </div>
         <div class="app-list">
             <div class="app-tab">
-                <hr>
-                <h5 class="form-tit">({{index}})索引基础信息</h5>
-                <table>
-                    <thead>
-                    <tr>
-                        <template v-if="sources.checkedFields">
-                            <th>id</th>
-                            <!--<th>_index</th>-->
-                            <!--<th>_type</th>-->
-                            <template v-for="field in sources.checkedFields">
-                                <th class="td-format">{{field}}</th>
-                            </template>
-                            <th>操作</th>
-                        </template>
-                    </tr>
-                    </thead>
-                    <tbody>
-
-                    <template v-if="Search_Result">
-                        <template v-for="(info1,index) in Search_Result.hits.hits">
-                            <tr>
-                                <td>{{index+1}}</td>
-                                <template v-if="Index_MappingController_Mapping_Compatible_Result">
-                                    <!--<td>{{info1._index}}</td>-->
-                                    <!--<td>{{info1._type}}</td>-->
-                                    <template v-for="field in sources.checkedFields">
-                                        <td class="in-line td-format">{{info1._source[field]}}</td>
-                                    </template>
+                <template v-for="indexTmp in result.indexSet">
+                    <hr>
+                    <h5 class="form-tit">({{indexTmp}})索引基础信息</h5>
+                    <table>
+                        <thead>
+                        <tr>
+                            <template v-if="result.mappings[indexTmp]">
+                                <th>id</th>
+                                <!--<th>_index</th>-->
+                                <!--<th>_type</th>-->
+                                <template v-for="field in result.mappings[indexTmp]">
+                                    <th class="td-format">{{field}}</th>
                                 </template>
-                                <td class="in-line">
-                                    <span @click="Index_DocumentController_Get(info1._index,info1._type,info1._id)">查看</span>
-                                    <span @click="edit(info1._index,info1._type,info1._id,info1._source)">修改</span>
-                                    <span class="red"
-                                          @click="Index_DocumentController_Delete(info1._index,info1._type,info1._id)">删除</span>
-                                </td>
-                            </tr>
+                                <th>操作</th>
+                            </template>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <template v-if="Search_Result">
+                            <template v-for="(info1,index) in Search_Result.hits.hits">
+                                <template v-if="info1._index == indexTmp">
+                                    <tr>
+                                        <td>{{index+1}}</td>
+                                        <template v-if="result.mappings[indexTmp]">
+                                            <!--<td>{{info1._index}}</td>-->
+                                            <!--<td>{{info1._type}}</td>-->
+                                            <template v-for="field in result.mappings[indexTmp]">
+                                                <td class="in-line td-format">{{info1._source[field]}}</td>
+                                            </template>
+                                        </template>
+                                        <td class="in-line">
+                                            <span @click="Index_DocumentController_Get(info1._index,info1._type,info1._id)">查看</span>
+                                            <span @click="edit(info1._index,info1._type,info1._id,info1._source)">修改</span>
+                                            <span class="red"
+                                                  @click="Index_DocumentController_Delete(info1._index,info1._type,info1._id)">删除</span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
                         </template>
-                    </template>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </template>
             </div>
+
         </div>
         <div class="mt10">
             <!--/** */:page-size  数一页的数量！！！-->
@@ -170,7 +175,7 @@
     export default {
         data() {
             return {
-                index: '样例数据',
+                index: 'tb_object_*',
                 Index_MappingController_Mapping_Compatible_Result: {//不同版本之间的格式相对有差别
                     "样例数据": {
                         "type": "text",
@@ -223,9 +228,9 @@
                     query: {
                         multi_match: {
                             fields: [
-                                "string"
+                                "样例数据"
                             ],
-                            query: "string",
+                            query: "",
                             tie_breaker: 0,
                             type: "best_fields"
                         }
@@ -265,10 +270,9 @@
                         urls: []
                     }
                 },
-                sql: {
-                    content: '',
-                    hintOptions: {tables: {}},
-                    editor: null
+                result: {
+                    indexSet: [],
+                    mappings: []//存放映射的数组
                 }
             }
         },
@@ -279,7 +283,7 @@
         created() {
             let self = this;
             const index = this.$route.query && this.$route.query.index;
-            self.index = index;
+
             const header_ES_HOST = this.$route.query && this.$route.query.header_ES_HOST;
             if (null != header_ES_HOST) {
                 self.headers.ES_HOST = JSON.parse(header_ES_HOST);
@@ -287,57 +291,54 @@
             this.ConfigController_GetDefaultServers();
             self.ConfigController_GetServers();
             if (null != index) {
+                self.index = index;
                 self.Search();
             }
+            self.ConfigController_GetMulti_match_fields();
+            self.ConfigController_GetMulti_match_fields_defaultList();
         }
         ,
         watch: {}
         ,
-        methods: {//获取具体的配置
-            Index_MappingController_Mapping_Compatible() {
+        methods: {
+            Index_MappingController_Mapping_CompatibleAll() {
                 let self = this;
-                self.$http.post(self.api.Index_MappingController_Mapping_Compatible + "/" + self.index + "/_mapping/compatible", {}, {
-                    headers: {
-                        "ES_HOST": self.headers.ES_HOST
-                    }
-                }, function (response) {
-                    if (response.code == 0) {
-                        self.Index_MappingController_Mapping_Compatible_Result = response.content;
-                        //提取全部的key
-                        const keys = [];
-                        for (var key in response.content) {
-                            keys.push(key);
+                for (const i in self.result.indexSet) {
+                    self.$http.post(self.api.Index_MappingController_Mapping_Compatible + "/" + self.result.indexSet[i] + "/_mapping/compatible", {}, {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
                         }
-                        self.sources.fields = keys;
-                        self.sources.checkedFields = keys;
-
+                    }, function (response) {
+                        if (response.code == 0) {
+                            //提取全部的key
+                            const keys = [];
+                            for (var key in response.content) {
+                                keys.push(key);
+                            }
+                            self.result.mappings[self.result.indexSet[i]] = keys;//结构存入mappings
+                            // debugger
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
                         self.$message({
-                            type: 'success',
-                            message: '查询成功',
-                            duration: 2000
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
                         });
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                })
-
+                    })
+                }
             }
             ,
             Search() {
                 let self = this;
-                self.Index_MappingController_Mapping_Compatible();//获取索引结构
-                //self.request._source = self.sources.checkedFields;//这个很重要 需要考虑是否启用
+                // self.Index_MappingController_Mapping_Compatible();//获取索引结构
+                self.request.query.multi_match.fields = self.sources.checkedFields;
                 self.$http.post(self.api.Search + self.index + "/_search", self.request, {
                     headers: {
                         "ES_HOST": self.headers.ES_HOST,
@@ -355,6 +356,17 @@
                         } else if (null != self.Search_Result.hits.total) {
                             self.Search_Result.compatible_total = self.Search_Result.hits.total;
                         }
+                        //下面的极为重要 -> 用于渲染
+                        const indexSet = [];
+                        for (var key in self.Search_Result.hits.hits) {
+                            //遍历结果集 -> 根据index获取字段
+                            const indexTmp = self.Search_Result.hits.hits[key]._index;
+                            if (!indexSet.includes(indexTmp)) {
+                                indexSet.push(indexTmp)
+                            }
+                        }
+                        self.result.indexSet = indexSet.sort();
+                        self.Index_MappingController_Mapping_CompatibleAll();
                         self.$message({
                             type: 'success',
                             message: '查询成功',
@@ -411,68 +423,66 @@
                 )
             }
             ,
+            ConfigController_GetMulti_match_fields() {
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetMulti_match_fields, {}, function (response) {
+                        if (response.code == 0) {
+                            self.sources.fields = response.content;
+
+                            self.$message({
+                                type: 'success',
+                                message: '查询成功',
+                                duration: 2000
+                            });
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            }
+            ,
+            ConfigController_GetMulti_match_fields_defaultList() {
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetMulti_match_fields_defaultList, {}, function (response) {
+                        if (response.code == 0) {
+                            self.sources.checkedFields = response.content;
+                            self.$message({
+                                type: 'success',
+                                message: '查询成功',
+                                duration: 2000
+                            });
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            },
             handleCurrentChange(currentChange) {
                 let self = this;
                 self.request.from = (currentChange - 1) * self.request.size;
                 self.Search();
-            }
-            ,
-            searchEvent() {
-                //SQL 转换成 ES
-                let self = this;
-                const sql = this.sql.editor.getValue();
-                self.$http.post(self.api.HelperController_SQLToEsHelper, sql, {
-                    headers: {
-                        "ES_HOST": self.headers.ES_HOST,
-                        'content-type': 'application/json'
-                    }
-                }, function (response) {
-                    if (response.code == 0) {
-                        self.HelperController_SQLToEsHelper_result = response.content;
-                        self.index = self.HelperController_SQLToEsHelper_result.index;
-                        self.DSL.data = self.HelperController_SQLToEsHelper_result.dslHelper;
-                        self.HelperController_DSLHelper();
-                        // self.sources.checkedFields = self.HelperController_SQLToEsHelper_result.fields;
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                });
-            },
-            HelperController_DSLHelper() {
-                //DSLParse
-                let self = this;
-                self.$http.post(self.api.HelperController_DSLHelper, self.DSL.data, {}, function (response) {
-                    if (response.code == 0) {
-                        self.request.query = response.content;
-                        self.request.from = 0;//这个比较重要 经常在上面吃亏! 存储不清除
-                        self.Search();
-
-                    } else {
-                        self.$message({
-                            type: 'error',
-                            message: response.msg,
-                            duration: 2000
-                        });
-                    }
-                }, function (response) {
-                    //失败回调
-                    self.$message({
-                        type: 'warning',
-                        message: '请求异常',
-                        duration: 1000
-                    });
-                });
             }
             ,
             outputToEvent(type) {
@@ -741,7 +751,8 @@
                     .catch(_ => {
                         self.dialog.dialogVisible = false
                     });
-            },
+            }
+            ,
             handleClose() {
                 let self = this;
                 //更新
@@ -781,7 +792,8 @@ AND "F4_0088" LIKE 'St*'  AND "F4_0088" NOT LIKE 'St*'
                 this.$alert('<pre>' + example + '</pre>', '注意', {
                     dangerouslyUseHTMLString: true
                 });
-            },
+            }
+            ,
             ConfigController_GetDefaultServers() {
                 //获取默认的地址
                 let self = this;
@@ -804,7 +816,8 @@ AND "F4_0088" LIKE 'St*'  AND "F4_0088" NOT LIKE 'St*'
                         });
                     }
                 )
-            },
+            }
+            ,
         }
 
 
