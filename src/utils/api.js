@@ -19,6 +19,8 @@ export default {
     "Index_Cat_Count": BASE_URL + '/Index/_cat/count/',
     "Index_Cat_Indices": BASE_URL + '/Index/_cat/indices/',
     "Index_MappingController_Mapping_Compatible": BASE_URL + '/Index_MappingController/', //Index_MappingController/tb_object_0088/_mapping/compatible
+    "Index_MappingController_Mapping_Compatible_List": BASE_URL + '/Index_MappingController/_mapping/compatible/list', //Index_MappingController/_mapping/compatible/list
+
     "Index_OpenCloseController_Close": BASE_URL + '/Index_OpenCloseController/', //Index_OpenCloseController/tb_object_0088/_close
     "Index_OpenCloseController_Open": BASE_URL + '/Index_OpenCloseController/', //Index_OpenCloseController/tb_object_0088/_open
     "Index_FreshFlushController_Refresh": BASE_URL + '/Index_FreshFlushController/', //Index_OpenCloseController/tb_object_0088/_refresh

@@ -10,7 +10,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="index">
-                    <el-input v-model="index" placeholder="tb_object_*" disabled></el-input>
+                    <el-input v-model="index" placeholder="tb_object_*"></el-input>
                 </el-form-item>
                 <el-form-item label="选择size">
                     <el-select v-model="request.size">
@@ -34,14 +34,14 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" class="el-button-search" @click="outputToEvent('excel')">导出为Excel
-                    </el-button>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">导出为DB
-                    </el-button>
-                </el-form-item>
+                <!--                <el-form-item>-->
+                <!--                    <el-button type="primary" class="el-button-search" @click="outputToEvent('excel')">导出为Excel-->
+                <!--                    </el-button>-->
+                <!--                </el-form-item>-->
+                <!--                <el-form-item>-->
+                <!--                    <el-button type="primary" class="el-button-search" @click="outputToEvent('db')">导出为DB-->
+                <!--                    </el-button>-->
+                <!--                </el-form-item>-->
 
             </el-form>
             <hr>
@@ -74,7 +74,7 @@
             <div style="margin: 15px 0;"></div>
         </div>
         <div class="app-list">
-            <div class="app-tab">
+            <div class="app-tab" :tag="tag.change.result">
                 <template v-for="indexTmp in result.indexSet">
                     <hr>
                     <h5 class="form-tit">({{indexTmp}})索引基础信息</h5>
@@ -108,9 +108,11 @@
                                         </template>
                                         <td class="in-line">
                                             <span @click="Index_DocumentController_Get(info1._index,info1._type,info1._id)">查看</span>
-                                            <span @click="edit(info1._index,info1._type,info1._id,info1._source)">修改</span>
-                                            <span class="red"
-                                                  @click="Index_DocumentController_Delete(info1._index,info1._type,info1._id)">删除</span>
+                                            <template v-if="role.role=='admin'">
+                                                <span @click="edit(info1._index,info1._type,info1._id,info1._source)">修改</span>
+                                                <span class="red"
+                                                      @click="Index_DocumentController_Delete(info1._index,info1._type,info1._id)">删除</span>
+                                            </template>
                                         </td>
                                     </tr>
                                 </template>
@@ -120,7 +122,6 @@
                     </table>
                 </template>
             </div>
-
         </div>
         <div class="mt10">
             <!--/** */:page-size  数一页的数量！！！-->
@@ -235,7 +236,7 @@
                             type: "best_fields"
                         }
                     },
-                    size: 10
+                    size: 500
                 },
                 bootstrap_servers: {
                     "home": "192.168.0.105:9092"
@@ -273,6 +274,14 @@
                 result: {
                     indexSet: [],
                     mappings: []//存放映射的数组
+                },
+                tag: {
+                    change: {
+                        result: 1 //设置是否渲染
+                    }
+                },
+                role: {
+                    role: 'visitor'
                 }
             }
         },
@@ -296,6 +305,13 @@
             }
             self.ConfigController_GetMulti_match_fields();
             self.ConfigController_GetMulti_match_fields_defaultList();
+            const query = this.$route.query && this.$route.query.query;//还原query
+            if (null != query) {
+                self.request.query.multi_match.query = query
+            }
+
+            const role = this.$route.query && this.$route.query.role;//角色
+            self.role.role = role;
         }
         ,
         watch: {}
@@ -303,36 +319,29 @@
         methods: {
             Index_MappingController_Mapping_CompatibleAll() {
                 let self = this;
-                for (const i in self.result.indexSet) {
-                    self.$http.post(self.api.Index_MappingController_Mapping_Compatible + "/" + self.result.indexSet[i] + "/_mapping/compatible", {}, {
-                        headers: {
-                            "ES_HOST": self.headers.ES_HOST
-                        }
-                    }, function (response) {
-                        if (response.code == 0) {
-                            //提取全部的key
-                            const keys = [];
-                            for (var key in response.content) {
-                                keys.push(key);
-                            }
-                            self.result.mappings[self.result.indexSet[i]] = keys;//结构存入mappings
-                            // debugger
-                        } else {
-                            self.$message({
-                                type: 'error',
-                                message: response.msg,
-                                duration: 2000
-                            });
-                        }
-                    }, function (response) {
-                        //失败回调
+                self.$http.post(self.api.Index_MappingController_Mapping_Compatible_List, self.result.indexSet, {
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST
+                    }
+                }, function (response) {
+                    if (response.code == 0) {
+                        self.result.mappings = response.content;
+                        // debugger
+                    } else {
                         self.$message({
-                            type: 'warning',
-                            message: '请求异常',
-                            duration: 1000
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
                         });
-                    })
-                }
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                })
             }
             ,
             Search() {

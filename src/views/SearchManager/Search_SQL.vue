@@ -122,9 +122,11 @@
                                 </template>
                                 <td class="in-line">
                                     <span @click="Index_DocumentController_Get(info1._index,info1._type,info1._id)">查看</span>
-                                    <span @click="edit(info1._index,info1._type,info1._id,info1._source)">修改</span>
-                                    <span class="red"
-                                          @click="Index_DocumentController_Delete(info1._index,info1._type,info1._id)">删除</span>
+                                    <template v-if="role.role=='admin'">
+                                        <span @click="edit(info1._index,info1._type,info1._id,info1._source)">修改</span>
+                                        <span class="red"
+                                              @click="Index_DocumentController_Delete(info1._index,info1._type,info1._id)">删除</span>
+                                    </template>
                                 </td>
                             </tr>
                         </template>
@@ -388,6 +390,9 @@
                         "*"
                     ],
                     "dslHelper": {}
+                },
+                role: {
+                    role: 'visitor'
                 }
             }
         },
@@ -409,6 +414,8 @@
             if (null != index) {
                 self.Search();
             }
+            const role = this.$route.query && this.$route.query.role;//角色
+            self.role.role = role;
         }
         ,
         watch: {}
