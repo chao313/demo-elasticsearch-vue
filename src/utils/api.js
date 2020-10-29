@@ -47,6 +47,8 @@ export default {
     "ConfigController_GetDefaultServers": BASE_URL + '/ConfigController/getDefaultServers',//获取默认值
     "ConfigController_GetMulti_match_fields": BASE_URL + '/ConfigController/getMulti_match_fields',//getMulti_match_fields
     "ConfigController_GetMulti_match_fields_defaultList": BASE_URL + '/ConfigController/getMulti_match_fields_defaultList',//获取多字段默认选中匹配地址
+    "ConfigController_GetRoleAdmin": BASE_URL + '/ConfigController/getRoleAdmin',//获取ip角色
+    "ConfigController_GetDemoStr": BASE_URL + '/ConfigController/getDemoStr',//获取demo
 
     /** helper服务地址 **/
     "HelperController_DSLHelper": BASE_URL + '/HelperController/DSLHelper',

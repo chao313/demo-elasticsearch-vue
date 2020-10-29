@@ -39,7 +39,7 @@
                                @click="sqlNotice()">注意
                     </el-button>
                 </el-form-item>
-                <template v-if="role.role=='admin'">
+                <template v-if="role.level > 0">
                     <el-form-item label="选择导出size" size="mini">
                         <el-select v-model="outPut.size" filterable @blur="selectBlur">
                             <el-option v-for=" item in outPut.level" :key="item" :label="item"
@@ -83,6 +83,15 @@
             <div style="margin: 15px 0;"></div>
             <hr>
             <el-collapse>
+                <el-collapse-item title="常用检索" name="2">
+                    <h3>
+                        <code>
+                        <pre>
+                          {{example.demo}}
+                        </pre>
+                        </code>
+                    </h3>
+                </el-collapse-item>
                 <el-collapse-item title="展示请求JSON" name="1">
                     <code>
                         <pre>{{request}}</pre>
@@ -124,7 +133,7 @@
                                 </template>
                                 <td class="in-line">
                                     <span @click="Index_DocumentController_Get(info1._index,info1._type,info1._id)">查看</span>
-                                    <template v-if="role.role=='admin'">
+                                    <template v-if="role.level == 100">
                                         <span @click="edit(info1._index,info1._type,info1._id,info1._source)">修改</span>
                                         <span class="red"
                                               @click="Index_DocumentController_Delete(info1._index,info1._type,info1._id)">删除</span>
@@ -276,7 +285,7 @@
                 level: ['15', '50', '100', '500', '1000', '2000'],
                 outPut: {
                     level: ['10', '500', '5000', '10000', '50000', '100000', '200000', '500000', '1000000', '-1'],
-                    size: '10000'
+                    size: '1000'
                 },
 
                 DSL: {
@@ -394,7 +403,12 @@
                     "dslHelper": {}
                 },
                 role: {
-                    role: 'visitor'
+                    roleName: 'visitor',
+                    level: 0,
+                    outPutLevel: []
+                },
+                example: {
+                    demo: ''
                 }
             }
         },
@@ -416,8 +430,10 @@
             if (null != index) {
                 self.Search();
             }
-            const role = this.$route.query && this.$route.query.role;//角色
-            self.role.role = role;
+            // const role = this.$route.query && this.$route.query.role;//角色
+            // self.role.role = role;
+            self.ConfigController_GetRoleAdmin();
+            self.ConfigController_GetDemoStr();
         }
         ,
         watch: {}
@@ -997,7 +1013,7 @@ AND "F4_0088" LIKE 'St*'  AND "F4_0088" NOT LIKE 'St*'
             ,
             sqlNotice() {
                 const example =
-                    `1.只支持示例的语法,其他语法不支持(比如不等于只支持<>)
+                    `1.只支持示例的语法,其他语法不支持(比如不等于只支持<>,不支持！=,不支持>)
 2.表名,字段名称和值都要双引号
 3.只支持AND如果要OR请转换成正则/in或者检索多次
 4.正则不支持速记语法,请转成常规语法(\\d -> [0-9])
@@ -1029,6 +1045,53 @@ AND "F4_0088" LIKE 'St*'  AND "F4_0088" NOT LIKE 'St*'
                     }
                 )
             },
+            ConfigController_GetRoleAdmin() {
+                //获取ip角色
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetRoleAdmin, {}, function (response) {
+                        if (response.code == 0) {
+                            self.role = response.content;
+                            self.outPut.level = self.role.outPutLevel;
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            },
+            ConfigController_GetDemoStr() {
+                //获取demo
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetDemoStr, {}, function (response) {
+                        if (response.code == 0) {
+                            self.example.demo = response.content;
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            }
         }
     }
 </script>

@@ -29,7 +29,7 @@
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
                 </el-form-item>
-                <template v-if="role.role=='admin'">
+                <template v-if="role.level > 0">
                     <el-form-item label="选择导出size" size="mini">
                         <el-select v-model="outPut.size" filterable @blur="selectBlur">
                             <el-option v-for=" item in outPut.level" :key="item" :label="item"
@@ -446,7 +446,7 @@
                                 </template>
                                 <td class="in-line">
                                     <span @click="Index_DocumentController_Get(info1._index,info1._type,info1._id)">查看</span>
-                                    <template v-if="role.role=='admin'">
+                                    <template v-if="role.level=='100'">
                                         <span @click="edit(info1._index,info1._type,info1._id,info1._source)">修改</span>
                                         <span class="red"
                                               @click="Index_DocumentController_Delete(info1._index,info1._type,info1._id)">删除</span>
@@ -598,7 +598,7 @@
                 level: ['15', '50', '100', '500', '1000', '2000'],
                 outPut: {
                     level: ['10', '500', '5000', '10000', '50000', '100000', '200000', '500000', '1000000', '-1'],
-                    size: '10000'
+                    size: '1000'
                 },
 
                 DSL: {
@@ -716,7 +716,9 @@
                     "dslHelper": {}
                 },
                 role: {
-                    role: 'visitor'
+                    roleName: 'visitor',
+                    level: 0,
+                    outPutLevel: []
                 }
             }
         },
@@ -733,9 +735,9 @@
             self.headers.ES_HOST = JSON.parse(header_ES_HOST);
             self.ConfigController_GetServers();
             self.Search();
-
-            const role = this.$route.query && this.$route.query.role;//角色
-            self.role.role = role;
+            self.ConfigController_GetRoleAdmin();
+            // const role = this.$route.query && this.$route.query.role;//角色
+            // self.role.role = role;
 
         }
         ,
@@ -780,8 +782,7 @@
                     });
                 })
 
-            }
-            ,
+            },
             Search() {
                 let self = this;
                 self.Index_MappingController_Mapping_Compatible();//获取索引结构
@@ -824,8 +825,7 @@
                     });
                 })
 
-            }
-            ,
+            },
             ConfigController_GetServers() {
                 let self = this;
                 self.$http.get(self.api.ConfigController_GetServers, {}, function (response) {
@@ -857,8 +857,7 @@
                         });
                     }
                 )
-            }
-            ,
+            },
             handleCurrentChange(currentChange) {
                 let self = this;
                 self.request.from = (currentChange - 1) * self.request.size;
@@ -887,8 +886,7 @@
                         duration: 1000
                     });
                 });
-            }
-            ,
+            },
             outputToEvent(type) {
                 //导出为excel
                 let self = this;
@@ -953,8 +951,7 @@
                     });
                 });
                 Loading.close();
-            }
-            ,
+            },
             outputToDb() {
                 //导出为excel
                 let self = this;
@@ -990,9 +987,7 @@
                     });
                 });
                 Loading.close();
-            }
-
-            ,
+            },
             Index_DocumentController_Delete(index, type, id) {
                 this.$confirm('是否删除该条索引？', '提示', {
                     confirmButtonText: '确定',
@@ -1028,8 +1023,7 @@
                         });
                     })
                 });
-            }
-            ,
+            },
             Index_DocumentController_Get(index, type, id) {
                 let self = this;
                 self.$http.get(self.api.Index_DocumentController_GET + index + "/" + type + "/" + id, {
@@ -1059,20 +1053,17 @@
                         duration: 1000
                     });
                 })
-            }
-            ,
+            },
             pen(value) {
                 this.$alert('<pre>' + value + '</pre>', '预览', {
                     dangerouslyUseHTMLString: true
                 });
-            }
-            ,
+            },
             penExcelUrl(values) {
                 this.$alert('<pre>' + value + '</pre>', '预览', {
                     dangerouslyUseHTMLString: true
                 });
-            }
-            ,
+            },
             edit(index, type, id, value) {
                 let self = this;
                 //清空
@@ -1087,8 +1078,7 @@
                 self.dialog.type = type;
                 self.dialog.id = id;
 
-            }
-            ,
+            },
             Index_DocumentController_Update(index, type, id, value) {
                 let self = this;
                 self.$http.put(self.api.Index_DocumentController_Update + index + "/" + type + "/" + id, value, {
@@ -1118,19 +1108,16 @@
                         duration: 1000
                     });
                 })
-            }
-            ,
+            },
             handleCheckAllChange(val) {
                 this.sources.checkedFields = val ? this.sources.fields : [];
                 this.sources.isIndeterminate = false;
-            }
-            ,
+            },
             handlecheckedFieldsChange(value) {
                 let checkedCount = value.length;
                 this.sources.checkAll = checkedCount === this.sources.fields.length;
                 this.sources.isIndeterminate = checkedCount > 0 && checkedCount < this.sources.fields.length;
-            }
-            ,
+            },
             handleUpdate() {
                 let self = this;
                 //更新
@@ -1153,8 +1140,7 @@
                     .catch(_ => {
                         self.Excel.dialog.dialogVisible = true;
                     });
-            }
-            ,
+            },
             DSLAdd(bool, type) {
                 //DSL 统一添加
                 let self = this;
@@ -1171,8 +1157,7 @@
                         self.DSL.data[bool][type].value.push('');
                     }
                 }
-            }
-            ,
+            },
             DSLRemove(bool, type, index) {
                 console.info("bool:" + bool + ",type:" + type + ";index:" + index)
                 //DSL统一移除
@@ -1308,8 +1293,7 @@ AND "F4_0088" LIKE 'St*'  AND "F4_0088" NOT LIKE 'St*'
                    `;
                 self.sql.editor.setValue(example);
 
-            }
-            ,
+            },
             sqlNotice() {
                 const example =
                     `1.只支持示例的语法,其他语法不支持(比如不等于只支持<>)
@@ -1320,6 +1304,30 @@ AND "F4_0088" LIKE 'St*'  AND "F4_0088" NOT LIKE 'St*'
                 this.$alert('<pre>' + example + '</pre>', '注意', {
                     dangerouslyUseHTMLString: true
                 });
+            },
+            ConfigController_GetRoleAdmin() {
+                //获取ip角色
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetRoleAdmin, {}, function (response) {
+                        if (response.code == 0) {
+                            self.role = response.content;
+                            self.outPut.level = self.role.outPutLevel;
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
             }
         }
 

@@ -83,7 +83,7 @@
                                 <span @click="routerToShardView(info.index)">分片</span>
                                 <span @click="routerToSegmentView(info.index)">段</span>
                                 <span @click="routerToRecoveryView(info.index)">恢复</span>
-                                <template v-if="role.role=='admin'">
+                                <template v-if="role.level > 0">
                                     <template v-if="info.status=='open'">
                                          <span @click="Index_OpenCloseController_Close(info.index)">
                                           <span class="red">关闭</span></span>
@@ -174,7 +174,9 @@
                     "home": ""//192.168.0.105:9092
                 },
                 role: {
-                    role: 'visitor'
+                    roleName: 'visitor',
+                    level: 0,
+                    outPutLevel: []
                 }
             }
         },
@@ -187,8 +189,9 @@
             self.bootstrap_servers = {};
             self.ConfigController_GetServers();
             self.ConfigController_GetDefaultServers();
-            const role = this.$route.query && this.$route.query.role;
-            self.role.role = role;
+            self.ConfigController_GetRoleAdmin();
+            // const role = this.$route.query && this.$route.query.role;
+            // self.role.role = role;
 
 
         },
@@ -451,11 +454,34 @@
                             self.headers.ES_HOST = response.content;
                             self.Cluster_IndexController_Cat_Indices();
                         } else {
-                            // self.$message({
-                            //     type: 'error',
-                            //     message: response.msg,
-                            //     duration: 2000
-                            // });
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            },
+            ConfigController_GetRoleAdmin() {
+                //获取ip角色
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetRoleAdmin, {}, function (response) {
+                        if (response.code == 0) {
+                            self.role = response.content;
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
                         }
                     }, function (response) {
                         //失败回调
