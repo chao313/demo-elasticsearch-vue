@@ -91,6 +91,70 @@
                     </template>
                     </tbody>
                 </table>
+                <h5 class="form-tit">Index(集群-索引)</h5>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>index</th>
+                        <th>health</th>
+                        <th>pri</th>
+                        <th>pri.store.size</th>
+                        <th>rep</th>
+                        <th>store.size</th>
+                        <th>status</th>
+                        <th>docs.count</th>
+                        <th>docs.deleted</th>
+                        <!-- <th>uuid</th>-->
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>索引名称</th>
+                        <th>健康状况</th>
+                        <th>主分片数量</th>
+                        <th>主分片存储</th>
+                        <th>复制</th>
+                        <th>存储</th>
+                        <th>状态</th>
+                        <th>文档数量</th>
+                        <th>文档删除数量</th>
+                        <!-- <th>uuid</th>-->
+                        <th>操作</th>
+                    </tr>
+                    <tbody>
+                    <template v-if="Index_Cat_Indices_Result">
+                        <tr v-for="(info,index) in Index_Cat_Indices_Result">
+                            <td>{{index+1}}</td>
+                            <td>{{info.index}}</td>
+                            <td>{{info.health}}</td>
+                            <td>{{info.pri}}</td>
+                            <td>{{info['pri.store.size']}}</td>
+                            <td>{{info.rep}}</td>
+                            <td>{{info['store.size']}}</td>
+                            <td>{{info.status}}</td>
+                            <td>{{info['docs.count']}}</td>
+                            <td>{{info['docs.deleted']}}</td>
+                            <!--<td>{{info.uuid}}</td>-->
+                            <td>
+                                <template v-if="role.level > 0">
+                                    <template v-if="info.status=='open'">
+                                         <span @click="Index_OpenCloseController_Close(info.index)">
+                                          <span class="red">关闭</span></span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="redSpan"
+                                              @click="Index_OpenCloseController_Open(info.index)">打开</span>
+                                    </template>
+                                    <span @click="Index_FreshFlushController_Refresh(info.index)">refresh</span>
+                                    <span @click="Index_FreshFlushController_Flush(info.index)">flush</span>
+                                </template>
+                            </td>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -129,6 +193,20 @@
                         }
                     }
                 },
+                Index_Cat_Indices_Result: [
+                    {
+                        "health": "-",//yellow 索引健康
+                        "status": "-",//open索引状态
+                        "index": "-",//tb_object_0088索引名称
+                        "uuid": "-",//S5Z-UZk1Tc-wZA1A-ONCtg索引UUID
+                        "pri": "-",//1索引主分片数量
+                        "rep": "-",//1索引复制分片数量
+                        "docs.count": "-",//30索引文档数量
+                        "docs.deleted": "-",//0索引删除文档数量
+                        "store.size": "-",//134.2kb索引存储size
+                        "pri.store.size": "-"//134.2kb主分片存储size
+                    }
+                ],
                 bootstrap: {
                     servers: ''//192.168.0.105:9092
                 },
@@ -153,12 +231,15 @@
         },
         created() {
             let self = this;
+            self.ConfigController_GetRoleAdmin();//获取权限
             const index = this.$route.query && this.$route.query.index;
             self.index = index;
             const header_ES_HOST = this.$route.query && this.$route.query.header_ES_HOST;
             self.headers.ES_HOST = JSON.parse(header_ES_HOST);
             self.ConfigController_GetServers();
             self.Index_SettingController_Settings();
+            self.Index_Cat_Indices();//查询index
+
         },
         watch: {},
         methods: {
@@ -298,8 +379,207 @@
             },
             searchEvent() {
                 this.queryBase();
-            }
-
+            },
+            Index_Cat_Indices() {
+                let self = this;
+                self.$http.get(self.api.Index_Cat_Indices + "/" + self.index, {
+                    params: {
+                        'format': 'JSON'
+                    },
+                    headers: {
+                        "ES_HOST": self.headers.ES_HOST,
+                    }
+                }, function (response) {
+                    if (response.code == 0) {
+                        self.Index_Cat_Indices_Result = response.content;
+                        self.$message({
+                            type: 'success',
+                            message: '查询成功',
+                            duration: 1000
+                        });
+                    } else {
+                        self.$message({
+                            type: 'error',
+                            message: response.msg,
+                            duration: 2000
+                        });
+                    }
+                }, function (response) {
+                    //失败回调
+                    self.$message({
+                        type: 'warning',
+                        message: '请求异常',
+                        duration: 1000
+                    });
+                })
+            },
+            ConfigController_GetRoleAdmin() {
+                //获取ip角色
+                let self = this;
+                self.$http.get(self.api.ConfigController_GetRoleAdmin, {}, function (response) {
+                        if (response.code == 0) {
+                            self.role = response.content;
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    }
+                )
+            },
+            Index_OpenCloseController_Close(index) {
+                this.$confirm('是否关闭该条索引？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    center: true
+                }).then(() => {
+                    let self = this;
+                    self.$http.post(self.api.Index_OpenCloseController_Close + "/" + index + "/_close", {}, {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
+                        if (response.code == 0) {
+                            self.$message({
+                                type: 'success',
+                                message: '关闭成功',
+                                duration: 2000
+                            });
+                            self.Index_Cat_Indices();
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    });
+                });
+            },
+            Index_OpenCloseController_Open(index) {
+                this.$confirm('是否打开该条索引？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    center: true
+                }).then(() => {
+                    let self = this;
+                    self.$http.post(self.api.Index_OpenCloseController_Open + "/" + index + "/_open", {}, {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
+                        if (response.code == 0) {
+                            self.$message({
+                                type: 'success',
+                                message: '打开成功',
+                                duration: 2000
+                            });
+                            self.Index_Cat_Indices();
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    })
+                });
+            },
+            Index_FreshFlushController_Refresh(index) {
+                this.$confirm('是否refresh该条索引？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    center: true
+                }).then(() => {
+                    let self = this;
+                    self.$http.get(self.api.Index_FreshFlushController_Refresh + "/" + index + "/_refresh", {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
+                        if (response.code == 0) {
+                            self.$message({
+                                type: 'success',
+                                message: 'refresh成功',
+                                duration: 2000
+                            });
+                            self.Index_Cat_Indices();
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    })
+                });
+            },
+            Index_FreshFlushController_Flush(index) {
+                this.$confirm('是否flush该条索引？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    center: true
+                }).then(() => {
+                    let self = this;
+                    self.$http.get(self.api.Index_FreshFlushController_Flush + "/" + index + "/_flush", {
+                        headers: {
+                            "ES_HOST": self.headers.ES_HOST
+                        }
+                    }, function (response) {
+                        if (response.code == 0) {
+                            self.$message({
+                                type: 'success',
+                                message: 'refresh成功',
+                                duration: 2000
+                            });
+                            self.Index_Cat_Indices();
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: response.msg,
+                                duration: 2000
+                            });
+                        }
+                    }, function (response) {
+                        //失败回调
+                        self.$message({
+                            type: 'warning',
+                            message: '请求异常',
+                            duration: 1000
+                        });
+                    })
+                });
+            },
 
         }
 
