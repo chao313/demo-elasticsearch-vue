@@ -19,13 +19,6 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="选择排序">
-                    <el-select v-model="request.sort">
-                        <el-option v-for=" item in sources.fields" :key="item" :label="item"
-                                   :value="item">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="el-button-search" @click="searchEvent()">查询</el-button>
                 </el-form-item>
@@ -255,7 +248,7 @@
                 }
                 ,
                 request: {
-                    "_source": [
+                    _source: [
                         "*"
                     ],
                     from: 0,
@@ -400,6 +393,7 @@
                     "fields": [
                         "*"
                     ],
+                    "sort":{},
                     "dslHelper": {}
                 },
                 role: {
@@ -480,10 +474,12 @@
             }
             ,
             Search() {
+                var loadingInstance = Loading.service({
+                    text: "加载中,请稍后..."
+                });
                 let self = this;
                 self.Index_MappingController_Mapping_Compatible();//获取索引结构
-                //self.request._source = self.sources.checkedFields;//这个很重要 需要考虑是否启用
-                self.$http.post(self.api.Search + self.index + "/_search", self.request, {
+                this.$http.post(self.api.Search + self.index + "/_search", self.request, {
                     headers: {
                         "ES_HOST": self.headers.ES_HOST,
                         'content-type': 'application/json'
@@ -520,7 +516,7 @@
                         duration: 1000
                     });
                 })
-
+                loadingInstance.close();
             }
             ,
             ConfigController_GetServers() {
@@ -564,6 +560,7 @@
             ,
             searchEvent() {
                 //SQL 转换成 ES
+                const loadingInstance = Loading.service();
                 let self = this;
                 const sql = this.sql.editor.getValue();
                 self.$http.post(self.api.HelperController_SQLToEsHelperBeta, sql, {
@@ -576,8 +573,10 @@
                         self.HelperController_SQLToEsHelper_result = response.content;
                         self.index = self.HelperController_SQLToEsHelper_result.index;
                         self.DSL.data = self.HelperController_SQLToEsHelper_result.dslHelper;
+                        self.request.sort = self.HelperController_SQLToEsHelper_result.sort;
+                        self.request._source = self.HelperController_SQLToEsHelper_result.fields;
                         self.HelperController_DSLHelper();
-                        // self.sources.checkedFields = self.HelperController_SQLToEsHelper_result.fields;
+                        self.sources.checkedFields = self.HelperController_SQLToEsHelper_result.fields;
                     } else {
                         self.$message({
                             type: 'error',
@@ -593,6 +592,7 @@
                         duration: 1000
                     });
                 });
+                Loading.close();
             },
             HelperController_DSLHelper() {
                 //DSLParse
@@ -657,7 +657,7 @@
                 //这里重写导出的size
                 const request = JSON.parse(JSON.stringify(self.request));
                 request.size = 1000;
-                var loadingInstance = Loading.service();
+                const loadingInstance = Loading.service();
                 self.$http.post(self.api.HelperController_OutputToExcel + self.index, request, {
                     params: {
                         'scroll': '1m',
@@ -724,7 +724,6 @@
                 });
                 Loading.close();
             }
-
             ,
             Index_DocumentController_Delete(index, type, id) {
                 this.$confirm('是否删除该条索引？', '提示', {
