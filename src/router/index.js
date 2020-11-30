@@ -58,6 +58,7 @@ const SearchManager_Search_Script = r => require.ensure([], () => r(require('@/v
 const SearchManager_Search_Scroll = r => require.ensure([], () => r(require('@/views/SearchManager/Search_Scroll')), 'SearchManager_Search_Scroll');
 const SearchManager_Search_Shard = r => require.ensure([], () => r(require('@/views/SearchManager/Search_Shard')), 'SearchManager_Search_Shard');
 const SearchManager_Search_SQL = r => require.ensure([], () => r(require('@/views/SearchManager/Search_SQL')), 'SearchManager_Search_SQL');
+const SearchManager_Search_Tool = r => require.ensure([], () => r(require('@/views/SearchManager/Search_TooL')), 'SearchManager_Search_Tool');
 const SearchManager_Search_SQL_Beta = r => require.ensure([], () => r(require('@/views/SearchManager/Search_SQL_Beta')), 'SearchManager_Search_SQL_Beta');
 
 
@@ -464,6 +465,16 @@ export const constantRouterMap = [
                 name: 'SearchManager_Search_SQL_Beta',
                 meta: {
                     title: 'Search - SQL检索_Beta'
+                },
+                hidden: false
+            }
+            ,
+            {
+                path: 'SearchManager_Search_Tool',
+                component: SearchManager_Search_Tool,
+                name: 'SearchManager_Search_Tool',
+                meta: {
+                    title: 'Search - SQL工具'
                 },
                 hidden: false
             }

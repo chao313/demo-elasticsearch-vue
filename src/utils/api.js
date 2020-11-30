@@ -54,6 +54,7 @@ export default {
     "HelperController_DSLHelper": BASE_URL + '/HelperController/DSLHelper',
     "HelperController_OutputToExcel": BASE_URL + '/HelperController/_search/outputToExcel/',//_search/outputToExcel/{index} 导出为excel
     "HelperController_OutputToDb": BASE_URL + '/HelperController/_search/outputToDB/',//_search/outputToDB/{index} 导出为db数据
+    "HelperController_OutputToCSV": BASE_URL + '/HelperController/_search/outputToCSV/',//_search/outputToDB/{index} 导出为CSV数据
     "HelperController_SQLToEsHelper": BASE_URL + '/HelperController/SQLToEsHelper',//HelperController/SQLToEsHelper
     "HelperController_SQLToEsHelperBeta": BASE_URL + '/HelperController/SQLToEsHelper_Beta',//HelperController/SQLToEsHelper Beta版本
 
